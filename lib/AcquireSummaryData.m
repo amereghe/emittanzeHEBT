@@ -1,20 +1,14 @@
-function [Is,cyProgs,cyCodes,BARs,FWHMs,ASYMs,INTs,nData]=AcquireData(currPaths,CAMPaths,DDSPaths,LGENnames)
+function [cyProgs,cyCodes,BARs,FWHMs,ASYMs,INTs,nData]=AcquireSummaryData(CAMPaths,DDSPaths)
     fprintf("acquiring data...\n");
-    nPaths=length(currPaths);
-    Is=zeros(1,nPaths);
+    nPaths=1;
     cyProgs=strings(1,2,nPaths); % CAM and DDS
     cyCodes=strings(1,2,nPaths); % CAM and DDS
     BARs=zeros(1,2,2,nPaths);    % CAM and DDS
     FWHMs=zeros(1,2,2,nPaths);   % CAM and DDS
     ASYMs=zeros(1,2,2,nPaths);   % CAM and DDS
     INTs=zeros(1,2,2,nPaths);    % CAM and DDS
-    nData=zeros(3,nPaths);       % CAM, DDS and current
+    nData=zeros(2,nPaths);       % CAM and DDS
     for ii=1:nPaths
-        % acquire currents
-        tmpIs=AcquireCurrent(currPaths(ii),LGENnames(ii));
-        nData(3,ii)=length(tmpIs);
-        Is(1:nData(3,ii),ii)=tmpIs;
-        fprintf("...acquired %d current values;\n",nData(3,ii));
         % acquire CAM/DDS data
         [camCyProgs,camCyCodes,camBARs,camFWHMs,camASYMs,camINTs]=ParseCAMSummaryFiles(CAMPaths(ii));
         [ddsCyProgs,ddsCyCodes,ddsBARs,ddsFWHMs,ddsASYMs,ddsINTs]=ParseCAMSummaryFiles(DDSPaths(ii),"DDS");

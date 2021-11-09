@@ -1,4 +1,4 @@
-function RawPlots(Is,FWHMs,BARs,INTs,nData,descs,actPlotNames)
+function RawPlots(Is,currNData,FWHMs,BARs,INTs,nData,descs,actPlotNames)
     fprintf("plotting data (raw plots)...\n");
     nScans=size(Is,2);
     for ii=1:nScans
@@ -33,7 +33,7 @@ function RawPlots(Is,FWHMs,BARs,INTs,nData,descs,actPlotNames)
         % corrente
         iPlot=iPlot+1;
         ax(iPlot)=subplot(3,3,iPlot);
-        plot(Is(1:nData(3,ii),ii),"*-");
+        plot(Is(1:currNData(ii),ii),"*-");
         grid on; ylabel("[A]"); xlabel("ID []");
         title("Scan current");
         % general

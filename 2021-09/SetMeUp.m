@@ -34,12 +34,16 @@ if ( length(paths)~=length(DDSpaths) ), error("...different number of paths (%d)
 % build actual paths
 currPaths=strings(length(paths),1);
 actCAMPaths=strings(length(paths),1);
+CAMProfsPaths=strings(length(paths),1);
 actDDSPaths=strings(length(paths),1);
+DDSProfsPaths=strings(length(paths),1);
 outNames=strings(length(paths),1);
 for ii=1:length(paths)
     currPaths(ii)=sprintf("%s\\%s\\%s",measPath,parentPath,currFiles(ii));
     actCAMPaths(ii)=sprintf("%s\\%s\\%s\\%s\\*summary.txt",measPath,parentPath,paths(ii),CAMpaths(ii));
+    CAMProfsPaths(ii)=sprintf("%s\\%s\\%s\\%s\\profiles\\*_profiles.txt",measPath,parentPath,paths(ii),CAMpaths(ii));
     actDDSPaths(ii)=sprintf("%s\\%s\\%s\\%s\\Data*.csv",measPath,parentPath,paths(ii),DDSpaths(ii));
+    DDSProfsPaths(ii)=sprintf("%s\\%s\\%s\\%s\\Profiles\\Data*DDSF.csv",measPath,parentPath,paths(ii),DDSpaths(ii));
     outNames(ii)=sprintf("%s\\%s",dataTree,plotNames(ii));
 end
 

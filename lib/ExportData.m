@@ -1,4 +1,4 @@
-function ExportData(Is,FWHMs,BARs,INTs,nData,indices,outNames)
+function ExportData(Is,currNData,FWHMs,BARs,INTs,nData,indices,outNames)
     fprintf("exporting data...\n");
     header={"ID curr" , "I [A]" , ...
         "ID CAM", "FWHM_x [mm]", "FWHM_y [mm]", "x [mm]", "y [mm]", "INT_x []", "INT_y []", ...
@@ -11,8 +11,8 @@ function ExportData(Is,FWHMs,BARs,INTs,nData,indices,outNames)
         C=cell(nPoints+1,nColumns);
         C(1,:)=header;
         iAdd=val-indices(3,1,ii);
-        iCol=1;      C(2+iAdd:nData(3,ii)+1+iAdd,iCol)=num2cell(1:nData(3,ii))';
-        iCol=iCol+1; C(2+iAdd:nData(3,ii)+1+iAdd,iCol)=num2cell(Is(1:nData(3,ii),ii));
+        iCol=1;      C(2+iAdd:currNData(ii)+1+iAdd,iCol)=num2cell(1:currNData(ii))';
+        iCol=iCol+1; C(2+iAdd:currNData(ii)+1+iAdd,iCol)=num2cell(Is(1:currNData(ii),ii));
         for jj=1:2 % CAMeretta,DDS
             iAdd=val-indices(jj,1,ii);
             iCol=iCol+1; C(2+iAdd:nData(jj,ii)+1+iAdd,iCol)=num2cell(1:nData(jj,ii))';
