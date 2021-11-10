@@ -4,6 +4,7 @@ function RawPlots(Is,currNData,FWHMs,BARs,INTs,nData,descs,actPlotNames)
     for ii=1:nScans
         if ( exist('actPlotNames','var') )
             ff = figure('visible','off');
+            ff.Position=[ ff.Position(1:2) 1.6*ff.Position(3:4) ]; % increase the default size of the plot
         else
             figure();
         end
