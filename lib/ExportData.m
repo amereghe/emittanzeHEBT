@@ -8,7 +8,7 @@ function ExportData(Is,currNData,FWHMs,BARs,INTs,nData,indices,outNames)
     nColumns=size(header,2);
     for ii=1:nScans
         val=max(indices(:,1,ii));   % highest min
-        C=cell(nPoints+1,nColumns);
+        C=cell(nPoints+1,nColumns); % do not forget the header (1st row)
         C(1,:)=header;
         iAdd=val-indices(3,1,ii);
         iCol=1;      C(2+iAdd:currNData(ii)+1+iAdd,iCol)=num2cell(1:currNData(ii))';
