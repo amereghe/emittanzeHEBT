@@ -21,6 +21,8 @@ run(sprintf("%s\\SetMeUp.m",dataTree));
 [cyProgs,cyCodes,BARs,FWHMs,ASYMs,INTs,summNData]=AcquireSummaryData(actCAMPaths,actDDSPaths);
 % - parse current files
 [Is,currNData]=AcquireCurrentData(currPaths,LGENnames);
+% - plot distributions
+ShowParsedDistributions(profiles,Is,LGENnames,indices);
 % - raw plots
 % RawPlots(Is,currNData,FWHMs,BARs,INTs,summNData,descs,outNames);
 RawPlots(Is,currNData,profFWHMs,profBARs,profINTs,profNData,descs,outNames);
