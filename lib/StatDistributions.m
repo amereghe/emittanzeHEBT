@@ -1,5 +1,5 @@
 function [BARs,FWHMs,INTs]=StatDistributions(profiles)
-    fprintf("computing stats...");
+    fprintf("computing stats...\n");
     nDataSets=size(profiles,2)-1;
     BARs=zeros(nDataSets,2,2); % 2: hor/ver; 3: CAM/DDS
     FWHMs=zeros(nDataSets,2,2); % 2: hor/ver; 3: CAM/DDS
@@ -8,10 +8,11 @@ function [BARs,FWHMs,INTs]=StatDistributions(profiles)
         switch ii
             case 1
                 fprintf("...CAMeretta...\n");
+                [BARs(:,:,ii),FWHMs(:,:,ii),INTs(:,:,ii)]=StatDistributionsCAMProcedure(profiles(:,:,:,ii,:));
             case 2
                 fprintf("...DDS...\n");
+                [BARs(:,:,ii),FWHMs(:,:,ii),INTs(:,:,ii)]=StatDistributionsBDProcedure(profiles(:,:,:,ii,:));
         end
-        [BARs(:,:,ii),FWHMs(:,:,ii),INTs(:,:,ii)]=StatDistributionsProcedure(profiles(:,:,:,ii,:));
     end
     fprintf("...done!\n");
 end
