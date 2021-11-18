@@ -20,7 +20,7 @@ function CompareProfilesSummary(profBARs,profFWHMs,profINTs,BARs,FWHMs,INTs)
                 case 2
                     whatProf=profBARs; whatSumm=BARs; myYLab="BAR [mm]";
                 case 3
-                    whatProf=profINTs*1000; whatSumm=INTs; myYLab="INT []";
+                    whatProf=profINTs; whatSumm=INTs; myYLab="INT []";
             end
             subplot(nRows,nCols,iPlot);
             for iPlane=1:2
