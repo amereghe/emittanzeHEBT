@@ -9,29 +9,42 @@ pathToLibrary="lib";
 addpath(genpath(pathToLibrary));
 
 measPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY";
+LPOWmonPath="S:\Accelerating-System\Accelerator-data\Area dati MD\LPOWmonitor\ErrorLog";
 
 %% main - load infos
 % returns:
 dataTree="2021-09";
 run(sprintf("%s\\SetMeUp.m",dataTree));
-% - parse distributions
-[profCyProgs,profCyCodes,profiles,profNData]=AcquireDistributions(CAMProfsPaths,DDSProfsPaths);
-[profBARs,profFWHMs,profINTs]=StatDistributions(profiles);
+
+%% main - parse data files
+% - parse beam profiles
+[cyProgsProf,cyCodesProf,profiles,nDataProf]=AcquireDistributions(CAMProfsPaths,DDSProfsPaths);
+% - compute statistics on profiles
+[BARsProf,FWHMsProf,INTsProf]=StatDistributions(profiles);
 % - parse summary files
-[cyProgs,cyCodes,BARs,FWHMs,ASYMs,INTs,summNData]=AcquireSummaryData(actCAMPaths,actDDSPaths);
+[cyProgsSumm,cyCodesSumm,BARsSumm,FWHMsSumm,ASYMsSumm,INTsSumm,nDataSumm]=AcquireSummaryData(actCAMPaths,actDDSPaths);
 % - parse current files
-[Is,currNData]=AcquireCurrentData(currPaths,LGENnames);
+[Is,nDataCurr]=AcquireCurrentData(currPaths,LGENnames);
+% - parse LPOW monitor log
+[tStampsLPOWMon,LGENsLPOWMon,LPOWsLPOWMon,racksLPOWMon,repoValsLPOWMon,appValsLPOWMon,cyCodesLPOWMon,cyProgsLPOWMon,endCycsLPOWMon]=ParseLPOWLog(LPOWmonPaths);
+return
+
+%% main - cross checks
 % - compare data from summary files and statistics computed on profiles
-CompareProfilesSummary(profBARs,profFWHMs,profINTs,BARs,FWHMs,INTs);
+CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm);
+CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm);
 % - plot distributions (3D visualisation)
 ShowParsedDistributions(profiles,Is,LGENnames,indices);
-% - raw plots
-% RawPlots(Is,currNData,FWHMs,BARs,INTs,summNData,descs,outNames);
-RawPlots(Is,currNData,profFWHMs,profBARs,profINTs,profNData,descs,outNames);
-% - actual plots
-% ScanPlots(Is,FWHMs,BARs,indices,descs,outNames);
-ScanPlots(Is,profFWHMs,profBARs,indices,descs,outNames);
-% - export data to xlsx files
-% ExportData(Is,currNData,FWHMs,BARs,INTs,summNData,indices,outNames);
-ExportData(Is,currNData,profFWHMs,profBARs,profINTs,profNData,indices,outNames);
+return
 
+%% main - actual analysis
+% - raw plots
+% RawPlots(Is,nDataCurr,FWHMs,BARs,INTs,summNData,descs,outNames);
+RawPlots(Is,nDataCurr,FWHMsProf,BARsProf,INTsProf,nDataProf,descs,outNames);
+% - actual plots
+% ScanPlots(Is,FWHMsSumm,BARsSumm,indices,descs,outNames);
+ScanPlots(Is,FWHMsProf,BARsProf,indices,descs,outNames);
+% - export data to xlsx files
+% ExportData(Is,nDataCurr,FWHMs,BARs,INTs,summNData,indices,outNames);
+ExportData(Is,nDataCurr,FWHMsProf,BARsProf,profINTs,nDataProf,indices,outNames);
+return

@@ -21,6 +21,13 @@ plotNames=[
 CAMpaths=[
     "CarbSO2_LineZ_Size6_*"
     ];
+allLGENs=[
+    "PB-005A-LGEN" "PB-006A-LGEN" "PB-007A-LGEN" "PB-008A-LGEN" "PB-009A-LGEN" ;
+    ];
+LPOWlogFiles=[
+    "2021-09-02\*.txt"
+    "2021-09-03\*.txt"
+    ];
 fprintf("setting up data in %s - desc: %s ...\n",parentPath,description);
 
 % some consistency checks of user input
@@ -38,6 +45,7 @@ CAMProfsPaths=strings(length(paths),1);
 actDDSPaths=strings(length(paths),1);
 DDSProfsPaths=strings(length(paths),1);
 outNames=strings(length(paths),1);
+LPOWmonPaths=strings(length(LPOWlogFiles),1);
 for ii=1:length(paths)
     currPaths(ii)=sprintf("%s\\%s\\%s",measPath,parentPath,currFiles(ii));
     actCAMPaths(ii)=sprintf("%s\\%s\\%s\\%s\\*summary.txt",measPath,parentPath,paths(ii),CAMpaths(ii));
@@ -46,9 +54,12 @@ for ii=1:length(paths)
     DDSProfsPaths(ii)=sprintf("%s\\%s\\%s\\%s\\Profiles\\Data*DDSF.csv",measPath,parentPath,paths(ii),DDSpaths(ii));
     outNames(ii)=sprintf("%s\\%s",dataTree,plotNames(ii));
 end
+for ii=1:length(LPOWlogFiles)
+    LPOWmonPaths(ii)=sprintf("%s\\%s",LPOWmonPath,LPOWlogFiles(ii));
+end
 
 % indices in measurements
-indices=zeros(3,2,length(paths)); % 1st: CAM,DDS,current; 2nd: min,max;
+indices=zeros(3,2,length(paths)); % 1st: CAM (summary file), DDS (summary file), current; 2nd: min,max;
 indices(3,:,1)=[12 51];
 indices(1,:,1)=indices(3,:,1)-2;
 indices(2,:,1)=indices(3,:,1)-1;
