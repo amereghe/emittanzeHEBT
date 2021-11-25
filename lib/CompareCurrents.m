@@ -1,4 +1,4 @@
-function CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGENs,cyProgsSumm,cyProgsLPOWMon)
+function CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGENs,scannedIsTM,cyProgsSumm,cyProgsLPOWMon)
     fprintf("comparing currents: excel sheet vs LPOW log...\n");
     nScans=size(Is,2);
     nLGENsAll=length(allLGENs);
@@ -34,10 +34,15 @@ function CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGE
             currAppliedVals=appValsLPOWMon(currIndices);
             [vals,ia,ib]=intersect(xlsCyProgs,currCyProgs);
             if ( length(vals)==0 )
-                warning("...no data available in LPOWmon log for %s!",allLGENs(ii));
-                continue
+                warning("...no data available in LPOWmon log for %s - going with TM values",allLGENs(ii));
+                Xs=xlsCyProgs;
+                Ys=scannedIsTM(:,ii);
+                myLeg=[myLeg sprintf("%s - TM",allLGENs(ii))];
+            else
+                Xs=currCyProgs(ib);
+                Ys=currAppliedVals(ib);
             end
-            plot(currCyProgs(ib),currAppliedVals(ib),".-","Color",cm(end-(ii-1),:));
+            plot(Xs,Ys,".-","Color",cm(end-(ii-1),:));
             myLeg=[myLeg allLGENs(ii)];
         end
         grid on; xlabel("cyProgs []"); ylabel("I [A]"); title("All other LGEN of interest");

@@ -29,13 +29,45 @@ run(sprintf("%s\\SetMeUp.m",dataTree));
 [tStampsLPOWMon,LGENsLPOWMon,LPOWsLPOWMon,racksLPOWMon,repoValsLPOWMon,appValsLPOWMon,cyCodesLPOWMon,cyProgsLPOWMon,endCycsLPOWMon]=ParseLPOWLog(LPOWmonPaths);
 % - cyProgs of LPOWmon are off!!!!
 cyProgsLPOWMon=str2double(cyProgsLPOWMon)+4097; % 4097=2^12+1;
+% - get TM currents
+[cyCodesTM,rangesTM,EksTM,BrhosTM,currentsTM,fieldsTM,kicksTM,psNamesTM,FileNameCurrentsTM]=AcquireLGENValues(beamPart,machine,config);
+psNamesTM=string(psNamesTM);
+cyCodesTM=upper(string(cyCodesTM));
+% - fill in current arrays
+scannedIsTM=zeros(1,length(allLGENs));
+for iLGEN=1:length(allLGENs)
+    % find LGEN in TM array
+    ii=find(psNamesTM==allLGENs(iLGEN));
+    if ( ismissing(ii) )
+        error("...error while getting TM values for %s",allLGENs(iLGEN));
+    elseif ( length(ii)>1 )
+        error("...non unique entry named %s in TM values",allLGENs(iLGEN));
+    end
+    % find proper cyCode
+    uniqueCyCodes=unique(cyCodesProf);
+    uniqueCyCodes=uniqueCyCodes(~ismissing(uniqueCyCodes));
+    [rangeCodes,partCodes]=DecodeCyCodes(uniqueCyCodes);
+    rangeCode=unique(rangeCodes);
+    if ( ismissing(rangeCode) )
+        error("...error while getting unique range code from measurements");
+    elseif ( length(rangeCode)>1 )
+        error("...non unique range code in measurements");
+    end
+    jj=find(cyCodesTM==rangeCode);
+    if ( ismissing(jj) )
+        error("...error while getting unique range code in TM values");
+    elseif ( length(jj)>1 )
+        error("...non unique range code in TM values");
+    end
+    scannedIsTM(1:indices(3,2,1)-indices(3,1,1)+1,iLGEN)=currentsTM(jj,ii)';
+end
 return
 
 %% main - cross checks
 % - compare data from summary files and statistics computed on profiles
 CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm);
 % - compare currents
-CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGENs,cyProgsSumm,cyProgsLPOWMon); % indices are based on summary data
+CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGENs,scannedIsTM,cyProgsSumm,cyProgsLPOWMon); % indices are based on summary data
 % - plot distributions (3D visualisation)
 ShowParsedDistributions(profiles,Is,LGENnames,indices);
 return
