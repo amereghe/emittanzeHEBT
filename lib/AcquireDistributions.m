@@ -7,10 +7,10 @@ function [cyProgs,cyCodes,profiles,nData]=AcquireDistributions(CAMProfsPaths,DDS
         return
     end
     
-    profiles=zeros(1,2,2,2,1);    % 1:fiber_pos; 2:z,data; 3:hor/ver; 4:CAM/DDS; 5:nPaths;
-    cyProgs=strings(1,2,nPaths);  % CAM and DDS
-    cyCodes=strings(1,2,nPaths);  % CAM and DDS
-    nData=zeros(2,nPaths);        % CAM and DDS
+    profiles=zeros(1,2,2,2,nPaths); % 1:fiber_pos; 2:z,data; 3:hor/ver; 4:CAM/DDS; 5:nPaths;
+    cyProgs=strings(1,2,nPaths);    % CAM and DDS
+    cyCodes=strings(1,2,nPaths);    % CAM and DDS
+    nData=zeros(2,nPaths);          % CAM and DDS
     
     % acquire CAMeretta profiles
     if ( length(CAMProfsPaths)>0 )
