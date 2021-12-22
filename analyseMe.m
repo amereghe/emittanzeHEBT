@@ -10,76 +10,65 @@ addpath(genpath(pathToLibrary));
 
 measPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY";
 LPOWmonPath="S:\Accelerating-System\Accelerator-data\Area dati MD\LPOWmonitor\ErrorLog";
+fracEst=[ 0.875 0.75 0.625 0.5 0.375 0.25 ];
 
 %% main - load infos
 % returns:
 dataTree="2021-09";
-run(sprintf("%s\\SetMeUp.m",dataTree));
+run(sprintf("%s\\%s",dataTree,"SetMeUp_ScanZ212_C170.m"));
+run(sprintf("%s\\%s","lib","SetUpWorkSpace.m"));
 
 %% main - parse data files
 % - parse beam profiles
 [cyProgsProf,cyCodesProf,profiles,nDataProf]=AcquireDistributions(CAMProfsPaths,DDSProfsPaths);
 % - compute statistics on profiles
-[BARsProf,FWHMsProf,INTsProf]=StatDistributions(profiles);
+[BARsProf,FWHMsProf,INTsProf]=ComputeDistStats(profiles);
 % - parse summary files
 [cyProgsSumm,cyCodesSumm,BARsSumm,FWHMsSumm,ASYMsSumm,INTsSumm,nDataSumm]=AcquireSummaryData(actCAMPaths,actDDSPaths);
 % - parse current files
-[Is,nDataCurr]=AcquireCurrentData(currPaths,LGENnames);
+[IsXLS,LGENnamesXLS,nDataCurr]=AcquireCurrentData(currPath);
 % - parse LPOW monitor log
 [tStampsLPOWMon,LGENsLPOWMon,LPOWsLPOWMon,racksLPOWMon,repoValsLPOWMon,appValsLPOWMon,cyCodesLPOWMon,cyProgsLPOWMon,endCycsLPOWMon]=ParseLPOWLog(LPOWmonPaths);
 % - cyProgs of LPOWmon are off!!!!
-cyProgsLPOWMon=str2double(cyProgsLPOWMon)+4097; % 4097=2^12+1;
+if ( ~ismissing(LGENsLPOWMon) )
+    cyProgsLPOWMon=string(str2double(cyProgsLPOWMon)+4097); % 4097=2^12+1;
+end
 % - get TM currents
 [cyCodesTM,rangesTM,EksTM,BrhosTM,currentsTM,fieldsTM,kicksTM,psNamesTM,FileNameCurrentsTM]=AcquireLGENValues(beamPart,machine,config);
 psNamesTM=string(psNamesTM);
 cyCodesTM=upper(string(cyCodesTM));
-% - fill in current arrays
-scannedIsTM=zeros(1,length(allLGENs));
-for iLGEN=1:length(allLGENs)
-    % find LGEN in TM array
-    ii=find(psNamesTM==allLGENs(iLGEN));
-    if ( ismissing(ii) )
-        error("...error while getting TM values for %s",allLGENs(iLGEN));
-    elseif ( length(ii)>1 )
-        error("...non unique entry named %s in TM values",allLGENs(iLGEN));
-    end
-    % find proper cyCode
-    uniqueCyCodes=unique(cyCodesProf);
-    uniqueCyCodes=uniqueCyCodes(~ismissing(uniqueCyCodes));
-    [rangeCodes,partCodes]=DecodeCyCodes(uniqueCyCodes);
-    rangeCode=unique(rangeCodes);
-    if ( ismissing(rangeCode) )
-        error("...error while getting unique range code from measurements");
-    elseif ( length(rangeCode)>1 )
-        error("...non unique range code in measurements");
-    end
-    jj=find(cyCodesTM==rangeCode);
-    if ( ismissing(jj) )
-        error("...error while getting unique range code in TM values");
-    elseif ( length(jj)>1 )
-        error("...non unique range code in TM values");
-    end
-    scannedIsTM(1:indices(3,2,1)-indices(3,1,1)+1,iLGEN)=currentsTM(jj,ii)';
-end
-return
-
-%% main - cross checks
-% - compare data from summary files and statistics computed on profiles
-CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm);
-% - compare currents
-CompareCurrents(Is,indices,LGENnames,appValsLPOWMon,LGENsLPOWMon,allLGENs,scannedIsTM,cyProgsSumm,cyProgsLPOWMon); % indices are based on summary data
-% - plot distributions (3D visualisation)
-ShowParsedDistributions(profiles,Is,LGENnames,indices);
 return
 
 %% main - actual analysis
-% - raw plots
-% RawPlots(Is,nDataCurr,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,descs,outNames);
-RawPlots(Is,nDataCurr,FWHMsProf,BARsProf,INTsProf,nDataProf,descs,outNames);
-% - actual plots
-% ScanPlots(Is,FWHMsSumm,BARsSumm,indices,descs,outNames);
-ScanPlots(Is,FWHMsProf,BARsProf,indices,descs,outNames);
+% - build table of currents
+[tableIs]=BuildCurrentTable(cyCodesProf,cyProgsProf,allLGENs,IsXLS,LGENnamesXLS,psNamesTM,cyCodesTM,currentsTM,LGENsLPOWMon,cyProgsLPOWMon,appValsLPOWMon,indices);
+% - actual plots (FWHM and barycentre vs Iscan (actual range), CAMeretta and DDS)
+% ScanPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,indices,scanDescription,outName);
+ScanPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,outName);
 % - export data to xlsx files
-% ExportData(Is,nDataCurr,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,indices,outNames);
-ExportData(Is,nDataCurr,FWHMsProf,BARsProf,profINTs,nDataProf,indices,outNames);
+% ExportDataOverview(tableIs,allLGENs,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,indices,outName);
+ExportDataOverview(tableIs,allLGENs,FWHMsProf,BARsProf,INTsProf,nDataProf,indices,outName);
+% - compute statistics on profiles at different heights
+[BARsProfScan,FWHMsProfScan,INTsProfScan]=ComputeDistStats(profiles,fracEst);
+% - reduce values for FWxMs:
+[ReducedFWxM]=GetReducedFWxM(FWHMsProfScan,fracEst);
+% - show statistics on profiles at different heights
+FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedFWxM,fracEst,indices,scanDescription,outName);
+% - export data to xlsx files
+ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,indices,outName);
+ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,indices,outName,true);
+return
+
+%% main - cross checks
+% - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
+% RawPlots(IsXLS(:,LGENnamesXLS==LGENscanned),nDataCurr,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,scanDescription,outName);
+RawPlots(IsXLS(:,LGENnamesXLS==LGENscanned),nDataCurr,FWHMsProf,BARsProf,INTsProf,nDataProf,scanDescription,outName);
+% - compare data from summary files and statistics computed on profiles
+CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm);
+% - compare currents: LPOW error log vs xls and TM values
+if ( ~ismissing(LGENsLPOWMon) )
+    CompareCurrents(IsXLS,indices,LGENscanned,appValsLPOWMon,LGENsLPOWMon,allLGENs,tableIs,cyProgsSumm,cyProgsLPOWMon); % indices are based on summary data
+end
+% - plot distributions (3D visualisation)
+ShowParsedDistributions(profiles,IsXLS(:,LGENnamesXLS==LGENscanned),LGENscanned,indices);
 return
