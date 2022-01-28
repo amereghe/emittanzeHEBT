@@ -37,7 +37,6 @@ end
 [cyCodesTM,rangesTM,EksTM,BrhosTM,currentsTM,fieldsTM,kicksTM,psNamesTM,FileNameCurrentsTM]=AcquireLGENValues(beamPart,machine,config);
 psNamesTM=string(psNamesTM);
 cyCodesTM=upper(string(cyCodesTM));
-return
 
 %% main - actual analysis
 % - build table of currents
@@ -57,7 +56,6 @@ FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedF
 % - export data to xlsx files
 ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,indices,outName);
 ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,indices,outName,true);
-return
 
 %% main - cross checks
 % - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
@@ -71,4 +69,3 @@ if ( ~ismissing(LGENsLPOWMon) )
 end
 % - plot distributions (3D visualisation)
 ShowParsedDistributions(profiles,IsXLS(:,LGENnamesXLS==LGENscanned),LGENscanned,indices);
-return
