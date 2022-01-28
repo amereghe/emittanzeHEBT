@@ -22,9 +22,9 @@ function ScanPlots(Is,FWHMs,BARs,indices,scanDescription,actPlotName)
             iPlot=kk+(jj-1)*2;
             ax(iPlot)=subplot(2,2,iPlot);
             yyaxis left;
-            plot(Is(indices(3,1):indices(3,2)),whatToShow(indices(jj,1):indices(jj,2),1,jj),"*-"); ylabel(sprintf("HOR %s",labelY));
+            plot(Is(indices(1,1):indices(1,2)),whatToShow(indices(jj+1,1):indices(jj+1,2),1,jj),"*-"); ylabel(sprintf("HOR %s",labelY));
             yyaxis right;
-            plot(Is(indices(3,1):indices(3,2)),whatToShow(indices(jj,1):indices(jj,2),2,jj),"*-"); ylabel(sprintf("VER %s",labelY));
+            plot(Is(indices(1,1):indices(1,2)),whatToShow(indices(jj+1,1):indices(jj+1,2),2,jj),"*-"); ylabel(sprintf("VER %s",labelY));
             yyaxis left;
             grid on; xlabel("I [A]");
             title(sprintf("%s - %s",whatName,myMon)); % legend("HOR","VER","Location","best");

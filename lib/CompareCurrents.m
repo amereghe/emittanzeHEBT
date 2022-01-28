@@ -5,9 +5,9 @@ function CompareCurrents(Is,indices,LGENscanned,appValsLPOWMon,LGENsLPOWMon,allL
     figure();
     cm=colormap(parula(nLGENsAll));
     % align currents from excel to those from LPOW mon based on cyProgs
-    % NB: we are using cyProgs from beam data!
-    xlsCurrs=Is(indices(3,1):indices(3,2));
-    measCyProgs=str2double(cyProgsMeas(indices(1,1):indices(1,2)));
+    % NB: we are using cyProgs from beam data (use CAMeretta data)!
+    xlsCurrs=Is(indices(1,1):indices(1,2));
+    measCyProgs=str2double(cyProgsMeas(indices(2,1):indices(2,2)));
 
     % selected LGEN
     subplot(1,2,1);

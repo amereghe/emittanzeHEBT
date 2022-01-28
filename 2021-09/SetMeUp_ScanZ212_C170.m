@@ -21,10 +21,10 @@ machine="LineZ";
 config="TM"; % select configuration: TM, RFKO
 
 %% indices in measurements
-% - 1st col: 1=CAM (summary file), 2=DDS (summary file), 3=current;
+% - 1st col: 1=current, 2=CAM (summary file), 3=DDS (summary file);
 % - 2nd col: min,max;
 indices=zeros(3,2);
-indices(3,:)=[12 51];
-indices(1,:)=indices(3,:)-2;
-indices(2,:)=indices(3,:)-1;
+indices(1,:)=[12 51];
+indices(2,:)=indices(1,:)-2;
+indices(3,:)=indices(1,:)-1;
 
