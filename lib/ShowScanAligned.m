@@ -1,6 +1,6 @@
-function ScanPlots(Is,FWHMs,BARs,indices,scanDescription,titleSeries,actPlotName)
-% ScanPlots               to show FWxMs and BARs as a function of current
-%                          in single magnet scans
+function ShowScanAligned(Is,FWHMs,BARs,indices,scanDescription,titleSeries,actPlotName)
+% ShowScanAligned               to show FWxMs and BARs as a function of current
+%                                 in single magnet scans
 %
 % input:
 % - Is (float(:,1)): list of current values [A];

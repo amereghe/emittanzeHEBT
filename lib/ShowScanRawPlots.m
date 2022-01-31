@@ -1,7 +1,7 @@
-function RawPlots(Is,FWHMs,BARs,INTs,nData,scanDescription,titleSeries,actPlotName)
-% RawPlots               to show FWxMs, BARs and BARicentres of scans 
-%                          as simple sequence of values; current values
-%                          used in the scan are shown as well.
+function ShowScanRawPlots(Is,FWHMs,BARs,INTs,nData,scanDescription,titleSeries,actPlotName)
+% ShowScanRawPlots               to show FWxMs, BARs and BARicentres of scans 
+%                                  as simple sequence of values; current values
+%                                  used in the scan are shown as well.
 %
 % input:
 % - Is (float(:,1)): list of current values [A];

@@ -42,8 +42,9 @@ cyCodesTM=upper(string(cyCodesTM));
 % - build table of currents
 [tableIs]=BuildCurrentTable(cyCodesProf,cyProgsProf,allLGENs,IsXLS,LGENnamesXLS,psNamesTM,cyCodesTM,currentsTM,LGENsLPOWMon,cyProgsLPOWMon,appValsLPOWMon,indices);
 % - actual plots (FWHM and barycentre vs Iscan (actual range), CAMeretta and DDS)
-% ScanPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,indices,scanDescription,outName);
-ScanPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,outName);
+% ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,indices,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"]);
 % - export data to xlsx files
 % ExportDataOverview(tableIs,allLGENs,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,indices,outName);
 ExportDataOverview(tableIs,allLGENs,FWHMsProf,BARsProf,INTsProf,nDataProf,indices,outName);
@@ -59,8 +60,9 @@ ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,indic
 
 %% main - cross checks
 % - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
-% RawPlots(IsXLS(:,LGENnamesXLS==LGENscanned),nDataCurr,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,scanDescription,outName);
-RawPlots(IsXLS(:,LGENnamesXLS==LGENscanned),nDataCurr,FWHMsProf,BARsProf,INTsProf,nDataProf,scanDescription,outName);
+% ShowScanRawPlots(IsXLS(1:nDataCurr,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanRawPlots(IsXLS(1:nDataCurr,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,INTsProf,nDataProf,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanRawPlots(IsXLS(1:nDataCurr,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,INTsProf,nDataProf,scanDescription,["CAMeretta" "DDS"]);
 % - compare data from summary files and statistics computed on profiles
 CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm);
 % - compare currents: LPOW error log vs xls and TM values
