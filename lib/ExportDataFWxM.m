@@ -1,7 +1,12 @@
-function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,fracEst,nData,indices,outName,lReduced)
+function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,fracEst,nData,indices,outName,lReduced,lFit)
     if ( ~exist('lReduced','var') ), lReduced=false; end
+    if ( ~exist('lFit','var') ), lFit=false; end
     if ( lReduced )
-        myOutName=sprintf("%s_overview_FWxM_reduced.xlsx",outName);
+        if ( lFit )
+            myOutName=sprintf("%s_overview_FWxM_reduced_fit.xlsx",outName);
+        else
+            myOutName=sprintf("%s_overview_FWxM_reduced.xlsx",outName);
+        end
     else
         myOutName=sprintf("%s_overview_FWxM.xlsx",outName);
     end
@@ -29,7 +34,11 @@ function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,fracEst,nData,indices,outNa
             iCol=iCol+1; C(2+iAdds(iMon+1):nData(iMon)+1+iAdds(iMon+1),iCol)=num2cell(BARs(1:nData(iMon),iDim,iMon));
         end
         %
-        writecell(C,myOutName,'Sheet',mons(iMon));
+        if ( lReduced | lFit )
+            writecell(C([1 1+indices(1,1):1+indices(1,2)],:),myOutName,'Sheet',mons(iMon));
+        else
+            writecell(C,myOutName,'Sheet',mons(iMon));
+        end
     end
     fprintf("...done.\n");
 end
