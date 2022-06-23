@@ -18,8 +18,8 @@ fracEst=[ 0.875 0.75 0.625 0.5 0.375 0.25 ];
 
 %% main - load infos
 % returns:
-dataTree="2022-03";
-run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270.m"));
+dataTree="2022-03-13";
+run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
 run(sprintf("%s\\%s","lib","SetUpWorkSpace.m"));
 clear cyProgsProf cyCodesProf profiles nDataProf BARsProf FWHMsProf INTsProf IsXLS LGENnamesXLS nDataCurr BARsProfScan FWHMsProfScan INTsProfScan ReducedFWxM
 
@@ -45,25 +45,6 @@ cyCodesTM=upper(string(cyCodesTM));
 % - build table of currents
 [tableIs]=BuildCurrentTable(cyCodesProf,cyProgsProf,allLGENs,IsXLS(:,LGENnamesXLS==LGENscanned),LGENscanned,psNamesTM,cyCodesTM,currentsTM,LGENsLPOWMon,cyProgsLPOWMon,appValsLPOWMon,indices);
 
-%% main - actual analysis
-% - actual plots (FWHM and barycentre vs Iscan (actual range), CAMeretta and DDS)
-% ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,indices,scanDescription,["CAMeretta" "DDS"],outName);
-ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"],outName);
-ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"]);
-% - export data to xlsx files
-% ExportDataOverview(tableIs,allLGENs,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,indices,outName);
-ExportDataOverview(tableIs,allLGENs,FWHMsProf,BARsProf,INTsProf,nDataProf,indices,outName);
-% - compute statistics on profiles at different heights
-[BARsProfScan,FWHMsProfScan,INTsProfScan]=ComputeDistStats(profiles,fracEst);
-% - reduce values for FWxMs:
-[ReducedFWxM]=GetReducedFWxM(FWHMsProfScan,fracEst);
-% - show statistics on profiles at different heights
-FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedFWxM,fracEst,indices,scanDescription,outName);
-% - export data to xlsx files
-ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,indices,outName);
-ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,indices,outName,true);
-ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices,outName,true,true);
-
 %% main - cross checks
 % - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
 % ShowScanRawPlots(IsXLS(1:nDataCurr,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,scanDescription,["CAMeretta" "DDS"],outName);
@@ -80,4 +61,31 @@ end
 ShowParsedDistributions(profiles,LGENscanned,outName,IsXLS(:,LGENnamesXLS==LGENscanned),indices);
 ShowParsedDistributions(profiles,LGENscanned,"",IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices);
 ShowParsedDistributions(profiles,LGENscanned,outName);
+
+%% main - actual analysis
+% - actual plots (FWHM and baricentre vs Iscan (actual range), CAMeretta and DDS)
+% ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsSumm,BARsSumm,indices,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"],outName);
+ShowScanAligned(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProf,BARsProf,indices,scanDescription,["CAMeretta" "DDS"]);
+% - export data to xlsx files
+% myOutName=sprintf("%s_SummaryData.xlsx",outName); ExportDataOverview(tableIs,allLGENs,FWHMsSumm,BARsSumm,INTsSumm,nDataSumm,indices,myOutName);
+myOutName=sprintf("%s_ProfStatsData.xlsx",outName); ExportDataOverview(tableIs,allLGENs,FWHMsProf,BARsProf,INTsProf,nDataProf,indices,myOutName);
+% - compute statistics on profiles at different heights
+[BARsProfScan,FWHMsProfScan,INTsProfScan]=ComputeDistStats(profiles,fracEst);
+% - reduce values for FWxMs:
+[ReducedFWxM]=GetReducedFWxM(FWHMsProfScan,fracEst);
+% - show statistics on profiles at different heights
+FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedFWxM,fracEst,indices,scanDescription,outName);
+% - export data to xlsx files
+myOutName=sprintf("%s_FWxM.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices,myOutName);
+myOutName=sprintf("%s_SIGxM.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices,myOutName,true);
+
+%% main - MADX part
+% export MADX table
+MADXFileName=sprintf("%s_CAM.tfs",outName);
+nCols=size(tableIs,2);
+header="I_"+allLGENs+" [A]";
+headerTypes=strings(1,nCols);
+headerTypes(:)="%le";
+ExportMADXtable(MADXFileName,scanDescription,tableIs(fitIndices(1,1):fitIndices(1,2),:,1),header,headerTypes);
 
