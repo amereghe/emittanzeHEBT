@@ -1,10 +1,6 @@
-function ShowParsedDistributions(profiles,LGENscanned,actPlotName,Is,indices)
+function ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,Is,indices)
     fprintf("plotting distributions...\n");
-    if ( exist('Is','var') & exist('indices','var') )
-        myRemark="aligned distributions";
-    elseif ( ~exist('Is','var') & ~exist('indices','var') )
-        myRemark="all distributions";
-    else
+    if ( exist('Is','var') & ~exist('indices','var') )
         error("please provide me with both Is and indices!");
     end
     monitorNames=[ "CAMeretta" "DDS" ];
@@ -28,15 +24,10 @@ function ShowParsedDistributions(profiles,LGENscanned,actPlotName,Is,indices)
     sgtitle(sprintf("%s - %s",myRemark,LabelMe(LGENscanned)));
     
     % save figure
-    if ( exist('actPlotName','var') )
-        if ( strlength(actPlotName)>0 )
-            if ( exist('Is','var') )
-                MapFileOut=sprintf("%s_3D_reduced.fig",actPlotName);
-            else
-                MapFileOut=sprintf("%s_3D.fig",actPlotName);
-            end
-            savefig(MapFileOut);
-            fprintf("...saving to file %s ...\n",MapFileOut);
+    if ( exist('myOutName','var') )
+        if ( strlength(myOutName)>0 )
+            savefig(myOutName);
+            fprintf("...saving to file %s ...\n",myOutName);
         end
     end
     

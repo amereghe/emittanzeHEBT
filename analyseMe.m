@@ -11,12 +11,12 @@ addpath(genpath(pathToLibrary));
 pathToLibrary="lib";
 addpath(genpath(pathToLibrary));
 
+%% main - load infos
 measPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY";
 LPOWmonPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY\LPOW_error_log";
 % LPOWmonPath="S:\Accelerating-System\Accelerator-data\Area dati MD\LPOWmonitor\ErrorLog";
 fracEst=[ 0.875 0.75 0.625 0.5 0.375 0.25 ];
 
-%% main - load infos
 % returns:
 dataTree="2022-03-13";
 run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
@@ -58,9 +58,12 @@ if ( ~ismissing(LGENsLPOWMon) )
     CompareCurrents(IsXLS,indices,LGENscanned,appValsLPOWMon,LGENsLPOWMon,allLGENs,tableIs,cyProgsSumm,cyProgsLPOWMon); % indices are based on summary data
 end
 % - plot distributions (3D visualisation)
-ShowParsedDistributions(profiles,LGENscanned,outName,IsXLS(:,LGENnamesXLS==LGENscanned),indices);
-ShowParsedDistributions(profiles,LGENscanned,"",IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices);
-ShowParsedDistributions(profiles,LGENscanned,outName);
+myOutName=sprintf("%s_3D_aligned.fig",outName); myRemark="aligned distributions";
+ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),indices);
+myOutName=sprintf("%s_3D_fitDistributions.fig",outName); myRemark="distributions to be fitted";
+ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices);
+myOutName=sprintf("%s_3D_allIDs.fig",outName); myRemark="all distributions";
+ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark);
 
 %% main - actual analysis
 % - actual plots (FWHM and baricentre vs Iscan (actual range), CAMeretta and DDS)
