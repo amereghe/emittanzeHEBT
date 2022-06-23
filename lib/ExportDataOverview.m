@@ -1,5 +1,4 @@
-function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indices,outName)
-    myOutName=sprintf("%s_overview.xlsx",outName);
+function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indices,myOutName)
     mons=["CAM" "DDS"];
     planes=["hor" "ver"];
     fprintf("exporting data to file %s ...\n",myOutName);
