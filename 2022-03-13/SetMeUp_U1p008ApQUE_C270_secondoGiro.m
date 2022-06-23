@@ -6,7 +6,7 @@ currFile="Scan01QuadU.xlsx";
 LGENscanned="P9-003A-LGEN";              % scanning quad
 LGENscannedNickName="U1-008A-QUE";
 scanDescription="scan: U1-008A-QUE - C, 270 mm - secondo Giro";
-plotName="U1-008A-QUE_C270";
+plotName="U1-008A-QUE_C270_secondoGiro";
 CAMpaths=[
     "CarbSO1_LineU_Size6_*"
     ];
