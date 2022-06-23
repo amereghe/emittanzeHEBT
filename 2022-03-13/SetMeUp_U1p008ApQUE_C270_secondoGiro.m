@@ -5,7 +5,7 @@ path="secondo giro\Scan U1-08-H23";      % subfolder in parentPath
 currFile="Scan01QuadU.xlsx";
 LGENscanned="P9-003A-LGEN";              % scanning quad
 LGENscannedNickName="U1-008A-QUE";
-scanDescription="scan: U1-008A-QUE - C, 270 mm";
+scanDescription="scan: U1-008A-QUE - C, 270 mm - secondo Giro";
 plotName="U1-008A-QUE_C270";
 CAMpaths=[
     "CarbSO1_LineU_Size6_*"
