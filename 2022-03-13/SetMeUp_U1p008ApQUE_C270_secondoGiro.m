@@ -27,8 +27,9 @@ indices(1,:)=[5 44];
 indices(2,:)=indices(1,:)-2;
 indices(3,:)=indices(1,:)-1;
 % indices for fitting data
-fitIndices=zeros(3,2,7);
-fitIndices(2,:,:)=[8 26; 9 25; 10 24; 11 23; 12 22; 13 21; 14 20]'; % symmetric, 7 couples
+fitIndices=zeros(3,2,2,7);
+fitIndices(2,:,1,:)=[8 26; 9 25; 10 24; 11 23; 12 22; 13 21; 14 20]'; % symmetric, 7 couples
+fitIndices(2,:,2,:)=fitIndices(2,:,1,:);
 % fitIndices(2,:,:)=[7 23; 7 24; 7 25; 7 26; 8 23; 8 24; 8 25; 8 26; 9 23; 9 24; 9 25; 9 26; 10 23; 10 24; 10 25; 10 26; ]'; % asymmetric, 16 couples
-fitIndices(1,:,:)=fitIndices(2,:,:)+2;
-fitIndices(3,:,:)=fitIndices(2,:,:)+1;
+fitIndices(1,:,:,:)=fitIndices(2,:,:,:)+2;
+fitIndices(3,:,:,:)=fitIndices(2,:,:,:)+1;
