@@ -19,15 +19,12 @@ LPOWmonPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY\LPOW_error_log"
 % fracEst=[ 0.875 0.8125 0.75 0.6875 0.625 0.5625 0.5 0.4375 0.375 0.3125 0.25 ]; % very detailed
 fracEst=[ 0.85 0.75 0.65 0.55 0.45 0.35 0.25 ]; % 
 fracEstStrings=compose("frac=%g%%",fracEst*100);
-mons=["CAM" "DDS"]; nMons=length(mons);
-planes=["H" "V"];
 
 % returns:
 dataTree="2022-03-13";
 run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
 % run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p014ApQUE_C270_secondoGiro.m"));
 run(sprintf("%s\\%s","lib","SetUpWorkSpace.m"));
-nFitSets=size(fitIndices,4);
 
 %% main - parse data files
 % - parse beam profiles
@@ -104,10 +101,7 @@ end
 
 %% main - MADX part
 myMon="CAM"; iMon=find(strcmpi(myMon,mons));
-nMaxFitData=max(fitIndices(iMon+1,2,1,:))-min(fitIndices(iMon+1,1,1,:))+1;
-if ( size(fitIndices,3)==2 )
-    nMaxFitData=max(nMaxFitData,max(fitIndices(iMon+1,2,2,:))-min(fitIndices(iMon+1,1,2,:))+1);
-end
+nMaxFitData=max(fitIndices(iMon+1,2,:,:),[],"all")-min(fitIndices(iMon+1,1,:,:),[],"all")+1;
 
 %% export MADX table, to compute response matrices of scan
 MADXFileName=sprintf("%s_%s.tfs",outName,myMon);
@@ -145,21 +139,12 @@ SS=NaN(nMaxFitData,length(fracEst),length(planes),nFitSets);
 for iPlane=1:length(planes)
     for iFrac=1:length(fracEst)
         for iFitSet=1:nFitSets
-            if ( size(fitIndices,3)==2 )
-                % - range of data set to consider:
-                iMinFit=fitIndices(iMon+1,1,iPlane,iFitSet);
-                iMaxFit=fitIndices(iMon+1,2,iPlane,iFitSet);
-                % - corresponding range in current:
-                jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,iPlane,iFitSet));
-                jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,iPlane,iFitSet));
-            else
-                % - range of data set to consider:
-                iMinFit=fitIndices(iMon+1,1,1,iFitSet);
-                iMaxFit=fitIndices(iMon+1,2,1,iFitSet);
-                % - corresponding range in current:
-                jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,iFitSet));
-                jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,iFitSet));
-            end
+            % - range of data set to consider:
+            iMinFit=fitIndices(iMon+1,1,iPlane,iFitSet);
+            iMaxFit=fitIndices(iMon+1,2,iPlane,iFitSet);
+            % - corresponding range in current:
+            jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,iPlane,iFitSet));
+            jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,iPlane,iFitSet));
             nFit=iMaxFit-iMinFit+1;
             % - baricentres and sigmas:
             TT(1:nFit,iFrac,iPlane,iFitSet)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon);
@@ -172,9 +157,7 @@ for iPlane=1:length(planes)
     end
 end
 
-%%
-
-% show fitted parameters
+%% show fitted parameters
 for iPlane=1:length(planes)
     for iFitSet=1:nFitSets
         ShowFittedOpticsFunctions(beta0(:,:,iPlane,iFitSet),alpha0(:,:,iPlane,iFitSet),emiG(:,:,iPlane,iFitSet),dz(:,:,iPlane,iFitSet),dpz(:,:,iPlane,iFitSet),sigdpp,planes(iPlane),fracEstStrings);
@@ -184,7 +167,7 @@ end
 ShowFittedOpticsFunctionsGrouped(beta0,alpha0,emiG,dz,dpz,z,pz,fracEst,"FWxM []",planes,compose("fit set #%2d",1:nFitSets),sigdppStrings,myMon);
 ShowFittedEllipsesGrouped(beta0,alpha0,emiG,planes,compose("fit set #%2d",1:nFitSets),fracEstStrings,sigdppStrings,myMon);
 
-%% show fits
+%% compare fits and measured data
 clear gamma0; gamma0=(1+alpha0.^2)./beta0; % same size as alpha0 and beta0
 clear calcSigmas; calcSigmas=NaN(nMaxFitData,length(sigdpp),length(fracEst),length(planes),nFitSets);
 clear calcBars; calcBars=NaN(nMaxFitData,length(sigdpp),1,length(planes),nFitSets);
@@ -192,13 +175,8 @@ clear scanCurrents; scanCurrents=NaN(nMaxFitData,length(planes),nFitSets);
 for iFitSet=1:nFitSets
     for iPlane=1:length(planes)
         % - range if data set to consider:
-        if ( size(fitIndices,3)==2 )
-            jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,iPlane,iFitSet));
-            jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,iPlane,iFitSet));
-        else
-            jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,1,iFitSet));
-            jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,1,iFitSet));
-        end
+        jMinFit=find(indices(1,1):indices(1,2)==fitIndices(1,1,iPlane,iFitSet));
+        jMaxFit=find(indices(1,1):indices(1,2)==fitIndices(1,2,iPlane,iFitSet));
         nFit=jMaxFit-jMinFit+1;
         for iFrac=1:length(fracEst)
             % - actually transport optics
@@ -225,21 +203,12 @@ measSigma=NaN(nMaxFitData,length(planes),nFitSets);
 measBARs=NaN(nMaxFitData,length(planes));
 measCurr=NaN(nMaxFitData,length(planes));
 for iPlane=1:length(planes)
-    if ( size(fitIndices,3)==2 )
-        % - range of data set to consider:
-        iMinFit=min(fitIndices(iMon+1,1,iPlane,:));
-        iMaxFit=max(fitIndices(iMon+1,2,iPlane,:));
-        % - corresponding range in current:
-        jMinFit=find(indices(1,1):indices(1,2)==min(fitIndices(1,1,iPlane,:)));
-        jMaxFit=find(indices(1,1):indices(1,2)==max(fitIndices(1,2,iPlane,:)));
-    else
-        % - range of data set to consider:
-        iMinFit=min(fitIndices(iMon+1,1,1,:));
-        iMaxFit=max(fitIndices(iMon+1,2,1,:));
-        % - corresponding range in current:
-        jMinFit=find(indices(1,1):indices(1,2)==min(fitIndices(1,1,1,:)));
-        jMaxFit=find(indices(1,1):indices(1,2)==max(fitIndices(1,2,1,:)));
-    end
+    % - range of data set to consider:
+    iMinFit=min(fitIndices(iMon+1,1,iPlane,:));
+    iMaxFit=max(fitIndices(iMon+1,2,iPlane,:));
+    % - corresponding range in current:
+    jMinFit=find(indices(1,1):indices(1,2)==min(fitIndices(1,1,iPlane,:)));
+    jMaxFit=find(indices(1,1):indices(1,2)==max(fitIndices(1,2,iPlane,:)));
     nFit=iMaxFit-iMinFit+1;
     measSigma(1:nFit,iPlane,1:nFitSets)=reshape(ReducedFWxM(iMinFit:iMaxFit,iPlane,iMon,:),nFit,1,nFitSets);
     measBARs(1:nFit,iPlane)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon);

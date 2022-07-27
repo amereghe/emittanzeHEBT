@@ -31,4 +31,14 @@ for ii=1:length(LPOWlogFiles)
 end
 
 %%
+% - general infos
+mons=["CAM" "DDS"]; nMons=length(mons);
+planes=["H" "V"];
+% - fit infos
+nFitSets=size(fitIndices,4);
+if ( size(fitIndices,3)==1 )
+    fitIndices(:,:,2,:)=fitIndices(:,:,1,:);
+end
+
+%%
 fprintf("...done\n");
