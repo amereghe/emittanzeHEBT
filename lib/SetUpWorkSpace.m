@@ -39,6 +39,17 @@ nFitSets=size(fitIndices,4);
 if ( size(fitIndices,3)==1 )
     fitIndices(:,:,2,:)=fitIndices(:,:,1,:);
 end
+% - largest fit range
+iLargestFitRange=zeros(2,1); largestFitRange=zeros(2,1);
+for iMon=1:2
+    for iPlane=1:2
+        [myRange,myId]=max(fitIndices(iMon+1,2,iPlane,:)-fitIndices(iMon+1,1,iPlane,:)+1);
+        if (myRange>largestFitRange(iPlane))
+            largestFitRange(iPlane)=myRange;
+            iLargestFitRange(iPlane)=myId;
+        end
+    end
+end
 
 %%
 fprintf("...done\n");

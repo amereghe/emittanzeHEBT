@@ -70,9 +70,18 @@ end
 % - plot distributions (3D visualisation)
 myOutName=sprintf("%s_3D_aligned.fig",outName); myRemark="aligned distributions";
 ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),indices);
-for iFitSet=1:nFitSets
-    myOutName=sprintf("%s_3D_fitDistributions_%02d.fig",outName,iFitSet); myRemark=sprintf("distributions to be fitted (set # %2i)",iFitSet);
-    ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iFitSet));
+% for iFitSet=1:nFitSets
+%     myOutName=sprintf("%s_3D_fitDistributions_%02d.fig",outName,iFitSet); myRemark=sprintf("distributions to be fitted (set # %2i)",iFitSet);
+%     ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iFitSet));
+% end
+if ( iLargestFitRange(1)==iLargestFitRange(2) )
+    myOutName=sprintf("%s_3D_fitDistributions_largestFitRange.fig",outName); myRemark=sprintf("distributions to be fitted (largest set: # %2i)",iLargestFitRange(1));
+    ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iLargestFitRange(1)));
+else
+    for iPlane=1:2
+        myOutName=sprintf("%s_3D_fitDistributions_largestFitRange_%s.fig",outName,planes(iPlane)); myRemark=sprintf("distributions to be fitted (largest set on %s plane: # %2i)",planes(iPlane),iLargestFitRange(1));
+        ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iLargestFitRange(iPlane)));
+    end
 end
 myOutName=sprintf("%s_3D_allIDs.fig",outName); myRemark="all distributions";
 ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark);
@@ -93,10 +102,19 @@ clear  ReducedFWxM;
 [ReducedFWxM]=GetReducedFWxM(FWHMsProfScan,fracEst);
 % - show statistics on profiles at different heights
 FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedFWxM,fracEst,indices,scanDescription,outName);
-% - export data to xlsx files
-for iFitSet=1:nFitSets
-    myOutName=sprintf("%s_FWxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName);
-    myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName,true);
+% % - export data to xlsx files
+% for iFitSet=1:nFitSets
+%     myOutName=sprintf("%s_FWxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName);
+%     myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName,true);
+% end
+if ( iLargestFitRange(1)==iLargestFitRange(2) )
+    myOutName=sprintf("%s_FWxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName);
+    myOutName=sprintf("%s_SIGxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName,true);
+else
+    for iPlane=1:2
+        myOutName=sprintf("%s_FWxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName);
+        myOutName=sprintf("%s_SIGxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName,true);
+    end
 end
 
 %% main - MADX part
