@@ -118,7 +118,7 @@ else
 end
 
 %% main - MADX part
-myMon="CAM"; iMon=find(strcmpi(myMon,mons));
+myMon="DDS"; iMon=find(strcmpi(myMon,mons));
 nMaxFitData=max(fitIndices(iMon+1,2,:,:),[],"all")-min(fitIndices(iMon+1,1,:,:),[],"all")+1;
 
 %% export MADX table, to compute response matrices of scan
@@ -176,14 +176,14 @@ for iPlane=1:length(planes)
 end
 
 %% show fitted parameters
-for iPlane=1:length(planes)
-    for iFitSet=1:nFitSets
-        ShowFittedOpticsFunctions(beta0(:,:,iPlane,iFitSet),alpha0(:,:,iPlane,iFitSet),emiG(:,:,iPlane,iFitSet),dz(:,:,iPlane,iFitSet),dpz(:,:,iPlane,iFitSet),sigdpp,planes(iPlane),fracEstStrings);
-        ShowFittedOrbits(z(:,:,iPlane,iFitSet),pz(:,:,iPlane,iFitSet),dz(:,:,iPlane,iFitSet),dpz(:,:,iPlane,iFitSet),planes(iPlane),avedpp(:,iPlane,iFitSet),fracEstStrings);
-    end
-end
-ShowFittedOpticsFunctionsGrouped(beta0,alpha0,emiG,dz,dpz,z,pz,fracEst,"FWxM []",planes,compose("fit set #%2d",1:nFitSets),sigdppStrings,myMon);
-ShowFittedEllipsesGrouped(beta0,alpha0,emiG,planes,compose("fit set #%2d",1:nFitSets),fracEstStrings,sigdppStrings,myMon);
+% for iPlane=1:length(planes)
+%     for iFitSet=1:nFitSets
+%         ShowFittedOpticsFunctions(beta0(:,:,iPlane,iFitSet),alpha0(:,:,iPlane,iFitSet),emiG(:,:,iPlane,iFitSet),dz(:,:,iPlane,iFitSet),dpz(:,:,iPlane,iFitSet),sigdpp,planes(iPlane),fracEstStrings);
+%         ShowFittedOrbits(z(:,:,iPlane,iFitSet),pz(:,:,iPlane,iFitSet),dz(:,:,iPlane,iFitSet),dpz(:,:,iPlane,iFitSet),planes(iPlane),avedpp(:,iPlane,iFitSet),fracEstStrings);
+%     end
+% end
+ShowFittedOpticsFunctionsGrouped(beta0,alpha0,emiG,dz,dpz,z,pz,fracEst,"FWxM []",planes,compose("fit set #%2d",1:nFitSets),sigdppStrings,sprintf("%s - %s",scanDescription,myMon));
+ShowFittedEllipsesGrouped(beta0,alpha0,emiG,planes,compose("fit set #%2d",1:nFitSets),fracEstStrings,sigdppStrings,sprintf("%s - %s",scanDescription,myMon));
 
 %% compare fits and measured data
 clear gamma0; gamma0=(1+alpha0.^2)./beta0; % same size as alpha0 and beta0
@@ -232,8 +232,8 @@ for iPlane=1:length(planes)
     measBARs(1:nFit,iPlane)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon);
     measCurr(1:nFit,iPlane)=tableIs(jMinFit:jMaxFit,LGENnamesXLS==LGENscanned,iMon);
 end
-CompareFits(calcSigmas,scanCurrents,measSigma,measCurr,"SIG",sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned),compose("fit set #%2d",1:nFitSets),myMon);
-CompareFits(calcBars,scanCurrents,measBARs,measCurr,"BAR",sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned),compose("fit set #%2d",1:nFitSets),myMon);
+CompareFits(calcSigmas,scanCurrents,measSigma,measCurr,"SIG",sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned),compose("fit set #%2d",1:nFitSets),scanDescription,myMon);
+CompareFits(calcBars,scanCurrents,measBARs,measCurr,"BAR",sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned),compose("fit set #%2d",1:nFitSets),scanDescription,myMon);
 
 %%
 iFrac=4; iPlane=1;
