@@ -36,6 +36,14 @@ clear BARsProf FWHMsProf INTsProf ;
 % - parse summary files
 clear cyProgsSumm cyCodesSumm BARsSumm FWHMsSumm ASYMsSumm INTsSumm nDataSumm ;
 [cyProgsSumm,cyCodesSumm,BARsSumm,FWHMsSumm,ASYMsSumm,INTsSumm,nDataSumm]=AcquireSummaryData(actCAMPaths,actDDSPaths);
+% - map cyProgs from summary and from profiles (used for fitting)
+INTsMapped=NaN(size(INTsProf));
+for iMon=1:size(cyProgsSumm,2)
+    for iPlane=1:length(planes)
+        [~,ia,ib]=intersect(cyProgsProf(:,iMon),cyProgsSumm(:,iMon));
+        INTsMapped(ia,iPlane,iMon)=INTsSumm(ib,iPlane,iMon);
+    end
+end
 % - parse current files
 clear IsXLS LGENnamesXLS nDataCurr;
 [IsXLS,LGENnamesXLS,nDataCurr]=AcquireCurrentData(currPath);
@@ -104,16 +112,16 @@ clear  ReducedFWxM;
 FWxMPlots(IsXLS(:,LGENnamesXLS==LGENscanned),FWHMsProfScan,BARsProfScan,ReducedFWxM,fracEst,indices,scanDescription,outName);
 % % - export data to xlsx files
 % for iFitSet=1:nFitSets
-%     myOutName=sprintf("%s_FWxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName);
-%     myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName,true);
+%     myOutName=sprintf("%s_FWxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName);
+%     myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName,iFitSet); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iFitSet),myOutName,true);
 % end
 if ( iLargestFitRange(1)==iLargestFitRange(2) )
-    myOutName=sprintf("%s_FWxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName);
-    myOutName=sprintf("%s_SIGxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName,true);
+    myOutName=sprintf("%s_FWxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName);
+    myOutName=sprintf("%s_SIGxM_largestFitRange.xlsx",outName); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(1)),myOutName,true);
 else
     for iPlane=1:2
-        myOutName=sprintf("%s_FWxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName);
-        myOutName=sprintf("%s_SIGxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName,true);
+        myOutName=sprintf("%s_FWxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,FWHMsProfScan,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName);
+        myOutName=sprintf("%s_SIGxM_largestFitRange_%s.xlsx",outName,planes(iPlane)); ExportDataFWxM(tableIs,allLGENs,ReducedFWxM,BARsProfScan,INTsMapped,fracEst,nDataProf,fitIndices(:,:,:,iLargestFitRange(iPlane)),myOutName,true);
     end
 end
 

@@ -1,4 +1,4 @@
-function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,fracEst,nData,indices,myOutName,lReduced)
+function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indices,myOutName,lReduced)
     if ( ~exist('lReduced','var') ), lReduced=false; end
     mons=["CAM" "DDS"];
     planes=["hor" "ver"];
@@ -25,6 +25,8 @@ function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,fracEst,nData,indices,myOut
             else
                 iCol=iCol+1; C(1+indices(1,1,iDim):1+indices(1,2,iDim),iCol)=num2cell(1:indices(1,2,iDim)-indices(1,1,iDim)+1)';
             end
+            % INTs
+            iCol=iCol+1; C(2+iAdds(iMon+1,iDim):nData(iMon)+1+iAdds(iMon+1,iDim),iCol)=num2cell(INTs(1:nData(iMon),iDim,iMon));
             % FWxM
             for iLev=1:length(fracEst)
                 iCol=iCol+1; C(2+iAdds(iMon+1,iDim):nData(iMon)+1+iAdds(iMon+1,iDim),iCol)=num2cell(FWHMs(1:nData(iMon),iDim,iMon,iLev));
@@ -43,7 +45,10 @@ function header=CreateHeader(LGENnames,planes,fracEst,lReduced)
     header(1:length(LGENnames))="I_"+LGENnames+" [A]";
     iString=length(LGENnames);
     for iDim=1:length(planes)
+        % IDs
         iString=iString+1; header(iString)=sprintf("ID_%s",planes(iDim));
+        % INTs
+        iString=iString+1; header(iString)=sprintf("INT_%s",planes(iDim));
         % FWxM
         for iLev=1:length(fracEst)
             iString=iString+1;
