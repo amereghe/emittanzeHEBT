@@ -31,7 +31,7 @@ function ShowFittedEllipsesGrouped(beta,alpha,emiG,planeLabs,labels1,labels2,lab
         end
         legend(labels2,"Location","best");
         % general
-        sgtitle(sprintf("%s - %s",labels3(iLab3),myTit));
+        sgtitle(sprintf("%s - %s",myTit,labels3(iLab3)));
         if ( length(labels1)>1 )
             linkaxes(axs(:,1),"xy"); % all HOR ellypses
             linkaxes(axs(:,2),"xy"); % all VER ellypses

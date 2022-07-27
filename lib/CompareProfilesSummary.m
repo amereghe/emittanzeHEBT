@@ -39,6 +39,12 @@ function CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,I
                 plot(xDataProf,whatProf(:,iPlane,iRow),"o",...
                      xDataSumm,whatSumm(:,iPlane,iRow),"*");
             end
+            if ( strcmpi(extractBetween(myYLab,1,4),"FWHM") )
+                PlotMonsBinWidth(xDataProf,myTit);
+                legend("hor - prof","hor - summ","ver - prof","ver - summ","MON bin width","location","best");
+            else
+                legend("hor - prof","hor - summ","ver - prof","ver - summ","location","best");
+            end
             if ( exist('cyProgsProf','var') & exist('cyProgsSumm','var') )
                 xlabel("cyProgs []");
             else
@@ -46,7 +52,6 @@ function CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,I
             end
             ylabel(myYLab); grid on; title(myTit);
             if ( iCol==3 ), set(gca, 'YScale', 'log'); end
-            legend("hor - prof","hor - summ","ver - prof","ver - summ","location","best");
         end
     end
     fprintf("...end.\n");

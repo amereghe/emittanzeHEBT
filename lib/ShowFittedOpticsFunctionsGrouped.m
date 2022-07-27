@@ -70,9 +70,9 @@ function ShowFittedOpticsFunctionsGrouped(beta,alpha,emiG,disp,dispP,zz,zp,xVals
             %% general
             linkaxes(ax,"x");
             if ( length(labels2)>1 )
-                sgtitle(sprintf("%s plane - %s - %s",planeLabs(iPlane),labels2(iLab2),myTit));
+                sgtitle(sprintf("%s - %s plane - %s",myTit,planeLabs(iPlane),labels2(iLab2)));
             else
-                sgtitle(sprintf("%s plane - %s",planeLabs(iPlane),myTit));
+                sgtitle(sprintf("%s - %s plane",myTit,planeLabs(iPlane)));
             end
         end
     end

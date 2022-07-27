@@ -30,6 +30,7 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
                 Ys=FWHMs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon,iLev);
                 plot(Xs,Ys,"*-");
             end
+            PlotMonsBinWidth(Xs,myMon,"b");
             if (iPlot==1), legend(string(fracEst*100)+"%","Location","best"); end
             grid on; xlabel("I [A]"); ylabel(sprintf("FWxM_{%s} [mm]",planes(iPlane)));
         end
@@ -41,6 +42,7 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
                 Ys=ReducedFWxM(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon,iLev);
                 plot(Xs,Ys,"*-");
             end
+            PlotMonsBinWidth(Xs,myMon);
             % legend(string(fracEst*100)+"%","Location","best");
             grid on; xlabel("I [A]"); ylabel(sprintf("\\sigma_{%s} [mm]",planes(iPlane)));
         end
