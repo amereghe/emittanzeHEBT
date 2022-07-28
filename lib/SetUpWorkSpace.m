@@ -11,7 +11,8 @@ end
 
 %% build actual paths
 currPath=sprintf("%s\\%s\\%s",measPath,parentPath,currFile);
-outName=sprintf("%s\\%s",dataTree,plotName);
+savePath=sprintf("%s\\%s",dataTree,plotName);
+outName=sprintf("%s\\%s",savePath,plotName);
 % CAM/DDS paths
 nCamPaths=length(CAMpaths);
 actCAMPaths=strings(nCamPaths,1);
