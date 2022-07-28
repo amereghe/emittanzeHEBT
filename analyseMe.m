@@ -22,8 +22,8 @@ fracEstStrings=compose("frac=%g%%",fracEst*100);
 
 % returns:
 dataTree="2022-03-13";
-run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p014ApQUE_C270_secondoGiro.m"));
+% run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
+run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p014ApQUE_C270_secondoGiro.m"));
 run(sprintf("%s\\%s","lib","SetUpWorkSpace.m"));
 
 %% main - parse data files
@@ -81,7 +81,7 @@ if ( iLargestFitRange(1)==iLargestFitRange(2) )
     ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iLargestFitRange(1)));
 else
     for iPlane=1:2
-        myOutName=sprintf("%s_3D_fitDistributions_largestFitRange_%s.fig",outName,planes(iPlane)); myRemark=sprintf("distributions to be fitted (largest set on %s plane: # %2i)",planes(iPlane),iLargestFitRange(1));
+        myOutName=sprintf("%s_3D_fitDistributions_largestFitRange_%s.fig",outName,planes(iPlane)); myRemark=sprintf("distributions to be fitted (largest set on %s plane: # %2i)",planes(iPlane),iLargestFitRange(iPlane));
         ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,IsXLS(:,LGENnamesXLS==LGENscanned),fitIndices(:,:,:,iLargestFitRange(iPlane)));
     end
 end
@@ -121,7 +121,7 @@ else
 end
 
 %% main - MADX part
-myMon="DDS"; iMon=find(strcmpi(myMon,mons));
+myMon="CAM"; iMon=find(strcmpi(myMon,mons));
 nMaxFitData=max(fitIndices(iMon+1,2,:,:),[],"all")-min(fitIndices(iMon+1,1,:,:),[],"all")+1;
 
 %% export MADX table, to compute response matrices of scan

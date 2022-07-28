@@ -14,9 +14,9 @@ function ShowParsedDistributions(profiles,LGENscanned,myOutName,myRemark,Is,indi
             subplot(2,2,iPlot);
             if ( exist('Is','var') )
                 if ( size(indices,3)==1 )
-                   PlotSpectra(profiles(:,[1 indices(iMon,1):indices(iMon,2) ],iPlane,iMon),false,Is(indices(1,1):indices(1,2)),"I [A]");
+                   PlotSpectra(profiles(:,[0 indices(iMon+1,1):indices(iMon+1,2)]+1,iPlane,iMon),false,Is(indices(1,1):indices(1,2)),"I [A]");
                 else
-                   PlotSpectra(profiles(:,[1 indices(iMon,1,iPlane):indices(iMon,2,iPlane) ],iPlane,iMon),false,Is(indices(1,1,iPlane):indices(1,2,iPlane)),"I [A]");
+                   PlotSpectra(profiles(:,[0 indices(iMon+1,1,iPlane):indices(iMon+1,2,iPlane)]+1,iPlane,iMon),false,Is(indices(1,1,iPlane):indices(1,2,iPlane)),"I [A]");
                 end
             else
                 PlotSpectra(profiles(:,:,iPlane,iMon));

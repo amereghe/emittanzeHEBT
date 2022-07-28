@@ -11,7 +11,7 @@ function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indices,
         iAdds(:,2)=iAdds(:,1);
     else
         iAdds=AlignDataIndices(indices(:,:,1));
-        iAdds(:,2)=AlignDataIndices(indices(:,:,1));
+        iAdds(:,2)=AlignDataIndices(indices(:,:,2));
     end
     for iMon=1:length(mons)
         C=cell(nPoints+1,nColumns); % do not forget the header (1st row)
