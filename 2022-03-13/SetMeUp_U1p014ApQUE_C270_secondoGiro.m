@@ -27,8 +27,13 @@ indices(1,:)=[5 44];
 indices(2,:)=indices(1,:)-2;
 indices(3,:)=indices(1,:)-1;
 % indices for fitting data
-fitIndices=zeros(3,2,7);
-fitIndices(2,:,:)=[11 30; 12 29; 13 28; 14 27; 15 26; 16 25; 17 24]'; % symmetric, 7 couples
+% - 1st col: 1=current, 2=CAM (summary file), 3=DDS (summary file);
+% - 2nd col: min,max;
+% - 3rd col: hor,ver;
+% - 4th col: fit ranges;
+fitIndices=zeros(3,2,2,7);
+fitIndices(2,:,1,:)=[12 30; 13 29; 14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples
+fitIndices(2,:,2,:)=[16 42; 17 41; 18 40; 19 39; 20 38; 21 37; 22 36]'; % VER plane, symmetric, 7 couples
 % fitIndices(2,:,:)=[7 23; 7 24; 7 25; 7 26; 8 23; 8 24; 8 25; 8 26; 9 23; 9 24; 9 25; 9 26; 10 23; 10 24; 10 25; 10 26; ]'; % asymmetric, 16 couples
-fitIndices(1,:,:)=fitIndices(2,:,:)+2;
-fitIndices(3,:,:)=fitIndices(2,:,:)+1;
+fitIndices(1,:,:,:)=fitIndices(2,:,:,:)+2;
+fitIndices(3,:,:,:)=fitIndices(2,:,:,:)+1;
