@@ -33,16 +33,14 @@ beamPart="CARBON";
 machine="LineU";
 config="TM"; % select configuration: TM, RFKO
 
-dataTree="2022-03-13";
 scanSetUps=[
-    "SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
-    "SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U1p018ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U2p006ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
     ];
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p008ApQUE_C270_secondoGiro.m"));
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p014ApQUE_C270_secondoGiro.m"));
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U1p018ApQUE_C270_secondoGiro.m"));
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U2p006ApQUE_C270_secondoGiro.m"));
-% run(sprintf("%s\\%s",dataTree,"SetMeUp_U2p010ApQUE_C270_secondoGiro.m"));
 % - scan infos
 nScanSetUps=length(scanSetUps);
 iMinScanSetUps=1; iMaxScanSetUps=nScanSetUps;
@@ -59,14 +57,14 @@ indices=NaN(3,2,nScanSetUps);
 %   . 4th col: fit ranges;
 fitIndices=NaN(3,2,2,1,nScanSetUps);
 % - largest fit range
-iLargestFitRange=NaN(2,nScanSetUps); largestFitRange=NaN(2,nScanSetUps);
+iLargestFitRange=zeros(2,nScanSetUps); largestFitRange=zeros(2,nScanSetUps);
 % - how many fit ranges
 nFitRanges=NaN(2,nScanSetUps);
 % - load measuerement infos
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     clear fitIndicesH fitIndicesV;
-    run(sprintf("%s\\%s",dataTree,scanSetUps(iScanSetUps)));
-    run(sprintf("%s\\%s","lib","SetUpWorkSpace.m"));
+    run(scanSetUps(iScanSetUps));
+    run("lib\SetUpWorkSpace.m");
 end
 nMaxFitSets=size(fitIndices,4);
 % - LPOW paths

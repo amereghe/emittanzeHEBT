@@ -9,7 +9,8 @@ end
 
 %% build actual paths
 currPath(iScanSetUps)=sprintf("%s\\%s",measPath,currFile(iScanSetUps));
-savePath(iScanSetUps)=sprintf("%s\\%s",dataTree,plotName(iScanSetUps));
+[filepath,name,ext]=fileparts(scanSetUps(iScanSetUps)); clear filepath name ext;
+savePath(iScanSetUps)=sprintf("%s\\%s",filepath,plotName(iScanSetUps));
 outName(iScanSetUps)=sprintf("%s\\%s",savePath(iScanSetUps),plotName(iScanSetUps));
 % CAM/DDS paths
 for ii=1:length(CAMpaths)
