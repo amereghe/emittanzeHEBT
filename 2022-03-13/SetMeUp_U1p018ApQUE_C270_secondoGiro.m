@@ -1,12 +1,12 @@
 %% user input
-description(iScanSetUps)="2022-03: U1-014A-QUE";      % just a label
+description(iScanSetUps)="2022-03: U1-018A-QUE";      % just a label
 parentPath(iScanSetUps)="2022\Emittanze 2022";
-path(iScanSetUps)="secondo giro\Scan U1-14-H24";      % subfolder in parentPath
+path(iScanSetUps)="secondo giro\Scan U1-18-H25";      % subfolder in parentPath
 currFile(iScanSetUps)="Scan01QuadU.xlsx";
-LGENscanned(iScanSetUps)="P9-004A-LGEN";              % scanning quad
-LGENscannedNickName(iScanSetUps)="U1-014A-QUE";
-scanDescription(iScanSetUps)="scan: U1-014A-QUE - C, 270 mm - secondo Giro";
-plotName(iScanSetUps)="U1-014A-QUE_C270_secondoGiro";
+LGENscanned(iScanSetUps)="P9-005A-LGEN";              % scanning quad
+LGENscannedNickName(iScanSetUps)="U1-018A-QUE";
+scanDescription(iScanSetUps)="scan: U1-018A-QUE - C, 270 mm - secondo Giro";
+plotName(iScanSetUps)="U1-018A-QUE_C270_secondoGiro";
 clear CAMpaths DDSpaths;
 CAMpaths=[
     "CarbSO1_LineU_Size6_*"
@@ -20,8 +20,8 @@ indices(1,:,iScanSetUps)=[5 44];
 indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)-2;
 indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)-1;
 % indices for fitting data
-fitIndicesH=[12 30; 13 29; 14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples
-fitIndicesV=[16 42; 17 41; 18 40; 19 39; 20 38; 21 37; 22 36]'; % VER plane, symmetric, 7 couples
+fitIndicesH=[ 3 19; 4 18; 5 17; 6 16; 7 15; 8 14]'; % HOR plane, symmetric, 6 couples
+% fitIndicesH=[7 23; 7 24; 7 25; 7 26; 8 23; 8 24; 8 25; 8 26; 9 23; 9 24; 9 25; 9 26; 10 23; 10 24; 10 25; 10 26; ]'; % asymmetric, 16 couples
 if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);
 nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);

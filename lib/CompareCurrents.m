@@ -6,20 +6,25 @@ function CompareCurrents(Is,indices,LGENscanned,appValsLPOWMon,LGENsLPOWMon,allL
     cm=colormap(parula(nLGENsAll));
     % align currents from excel to those from LPOW mon based on cyProgs
     % NB: we are using cyProgs from beam data (use CAMeretta data)!
-    xlsCurrs=Is(indices(1,1):indices(1,2));
+    xlsCurrs=Is(indices(1,1):indices(1,2),allLGENs==LGENscanned);
     measCyProgs=cyProgsMeas(indices(2,1):indices(2,2));
 
     % selected LGEN
     subplot(1,2,1);
+    plot(str2double(measCyProgs),xlsCurrs,"k*"); % xls data
     tmpIndices=(LGENsLPOWMon==LGENscanned);
     tmpCyProgs=cyProgsLPOWMon(tmpIndices);
     tmpAppliedVals=appValsLPOWMon(tmpIndices);
     [vals,ia,ib]=intersect(measCyProgs,tmpCyProgs);
-    plot(str2double(measCyProgs(ia)),xlsCurrs(ia),"k*"); hold on;
-    ii=find(strcmpi(allLGENs,LGENscanned)); % ii is used to select the correct color in the color map
-    plot(str2double(tmpCyProgs(ib)),tmpAppliedVals(ib),".-","Color",cm(end-(ii-1),:));
+    if ( ~isempty(vals) )
+        ii=find(strcmpi(allLGENs,LGENscanned)); % ii is used to select the correct color in the color map
+        hold on ; plot(str2double(tmpCyProgs(ib)),tmpAppliedVals(ib),".-","Color",cm(end-(ii-1),:));
+        legend("xls","LPOW log","Location","best");
+    else
+        warning("...no data available in LPOWmon log for %s",LGENscanned);
+        legend("xls","Location","best");
+    end
     grid on; xlabel("cyProgs []"); ylabel("I [A]"); title(LabelMe(LGENscanned));
-    legend("LPOW log","xls","Location","best");
 
     % all other LGENs
     subplot(1,2,2);

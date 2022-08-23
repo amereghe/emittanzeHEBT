@@ -41,7 +41,7 @@ function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indices,myOu
 end
 
 function header=CreateHeader(LGENnames,planes)
-    whatLabels=[ "FW" "BAR" "INT" ];
+    whatLabels=[ "FWHM" "BAR" "INT" ];
     whatUnits=[ "mm" "mm" "" ];
     header=strings(1,length(LGENnames)+2+length(whatLabels)*length(planes));
     header(1:length(LGENnames))="I_"+LGENnames+" [A]";
