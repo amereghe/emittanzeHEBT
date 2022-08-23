@@ -1,4 +1,4 @@
-fprintf("setting up data in %s - desc: %s ...\n",parentPath(iScanSetUps),description(iScanSetUps));
+fprintf("setting up data in %s - desc: %s ...\n",path(iScanSetUps),description(iScanSetUps));
 
 %% some consistency checks of user input
 if ( sum(strcmpi(allLGENs,LGENscanned(iScanSetUps)))==0 )
@@ -8,15 +8,15 @@ elseif ( sum(strcmpi(allLGENs,LGENscanned(iScanSetUps)))>1 )
 end
 
 %% build actual paths
-currPath(iScanSetUps)=sprintf("%s\\%s\\%s",measPath,parentPath(iScanSetUps),currFile(iScanSetUps));
+currPath(iScanSetUps)=sprintf("%s\\%s",measPath,currFile(iScanSetUps));
 savePath(iScanSetUps)=sprintf("%s\\%s",dataTree,plotName(iScanSetUps));
 outName(iScanSetUps)=sprintf("%s\\%s",savePath(iScanSetUps),plotName(iScanSetUps));
 % CAM/DDS paths
 for ii=1:length(CAMpaths)
-    actCAMPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\%s\\*summary.txt",measPath,parentPath(iScanSetUps),path(iScanSetUps),CAMpaths(ii)); %#ok<*SAGROW>
-    actDDSPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\%s\\Data*.csv",measPath,parentPath(iScanSetUps),path(iScanSetUps),DDSpaths(ii));
-    CAMProfsPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\%s\\profiles\\*_profiles.txt",measPath,parentPath(iScanSetUps),path(iScanSetUps),CAMpaths(ii));
-    DDSProfsPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\%s\\Profiles\\Data*DDSF.csv",measPath,parentPath(iScanSetUps),path(iScanSetUps),DDSpaths(ii));
+    actCAMPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\*summary.txt",measPath,path(iScanSetUps),CAMpaths(ii)); %#ok<*SAGROW>
+    actDDSPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\Data*.csv",measPath,path(iScanSetUps),DDSpaths(ii));
+    CAMProfsPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\profiles\\*_profiles.txt",measPath,path(iScanSetUps),CAMpaths(ii));
+    DDSProfsPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\Profiles\\Data*DDSF.csv",measPath,path(iScanSetUps),DDSpaths(ii));
 end
 clear ii;
 

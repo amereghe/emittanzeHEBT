@@ -1,8 +1,7 @@
 %% user input
 description(iScanSetUps)="2022-03: U1-008A-QUE";      % just a label
-parentPath(iScanSetUps)="2022\Emittanze 2022";
-path(iScanSetUps)="secondo giro\Scan U1-08-H23";      % subfolder in parentPath
-currFile(iScanSetUps)="Scan01QuadU.xlsx";
+path(iScanSetUps)="2022\Emittanze 2022\secondo giro\Scan U1-08-H23";
+currFile(iScanSetUps)="2022\Emittanze 2022\Scan01QuadU.xlsx";
 LGENscanned(iScanSetUps)="P9-003A-LGEN";              % scanning quad
 LGENscannedNickName(iScanSetUps)="U1-008A-QUE";
 scanDescription(iScanSetUps)="scan: U1-008A-QUE - C, 270 mm - secondo Giro";
