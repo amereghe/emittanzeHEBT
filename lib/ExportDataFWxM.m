@@ -1,4 +1,4 @@
-function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indices,myOutName,lReduced)
+function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indicesMon,indicesCur,myOutName,lReduced)
     if ( ~exist('lReduced','var') ), lReduced=false; end
     mons=["CAM" "DDS"];
     planes=["hor" "ver"];
@@ -6,33 +6,24 @@ function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indices,
     header=CreateHeader(LGENnames,planes,fracEst,lReduced);
     nPoints=size(tableIs,1);
     nColumns=size(header,2);
-    if ( size(indices,3)==1 )
-        iAdds=AlignDataIndices(indices);
-        iAdds(:,2)=iAdds(:,1);
-    else
-        iAdds=AlignDataIndices(indices(:,:,1));
-        iAdds(:,2)=AlignDataIndices(indices(:,:,2));
-    end
     for iMon=1:length(mons)
+        myIndices=[indicesCur(iMon,:,:);indicesMon(iMon,:,:)];
+        iAdds=AlignDataIndices(myIndices);
         C=cell(nPoints+1,nColumns); % do not forget the header (1st row)
         C(1,:)=header;
-        C(2+iAdds(1):nPoints+1+iAdds(1),1:size(tableIs,2))=num2cell(tableIs(:,:,iMon));
+        C(2+iAdds(1,1):nPoints+1+iAdds(1,1),1:size(tableIs,2))=num2cell(tableIs(:,:,iMon));
         iCol=size(tableIs,2);
-        for iDim=1:length(planes)
+        for iPlane=1:length(planes)
             % IDs
-            if ( size(indices,3)==1 )
-                iCol=iCol+1; C(1+indices(1,1):1+indices(1,2),iCol)=num2cell(1:indices(1,2)-indices(1,1)+1)';
-            else
-                iCol=iCol+1; C(1+indices(1,1,iDim):1+indices(1,2,iDim),iCol)=num2cell(1:indices(1,2,iDim)-indices(1,1,iDim)+1)';
-            end
+            iCol=iCol+1; C(1+indicesCur(iMon,1,iPlane):1+indicesCur(iMon,2,iPlane),iCol)=num2cell(1:indicesCur(iMon,2,iPlane)-indicesCur(iMon,1,iPlane)+1)';
             % INTs
-            iCol=iCol+1; C(2+iAdds(iMon+1,iDim):nData(iMon)+1+iAdds(iMon+1,iDim),iCol)=num2cell(INTs(1:nData(iMon),iDim,iMon));
+            iCol=iCol+1; C(2+iAdds(2,iPlane):nData(iMon)+1+iAdds(2,iPlane),iCol)=num2cell(INTs(1:nData(iMon),iPlane,iMon));
             % FWxM
             for iLev=1:length(fracEst)
-                iCol=iCol+1; C(2+iAdds(iMon+1,iDim):nData(iMon)+1+iAdds(iMon+1,iDim),iCol)=num2cell(FWHMs(1:nData(iMon),iDim,iMon,iLev));
+                iCol=iCol+1; C(2+iAdds(2,iPlane):nData(iMon)+1+iAdds(2,iPlane),iCol)=num2cell(FWHMs(1:nData(iMon),iPlane,iMon,iLev));
             end
             % BAR
-            iCol=iCol+1; C(2+iAdds(iMon+1,iDim):nData(iMon)+1+iAdds(iMon+1,iDim),iCol)=num2cell(BARs(1:nData(iMon),iDim,iMon));
+            iCol=iCol+1; C(2+iAdds(2,iPlane):nData(iMon)+1+iAdds(2,iPlane),iCol)=num2cell(BARs(1:nData(iMon),iPlane,iMon));
         end
         %
         writecell(C,myOutName,'Sheet',mons(iMon));

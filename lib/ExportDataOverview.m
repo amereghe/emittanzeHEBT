@@ -1,27 +1,22 @@
-function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indices,myOutName)
+function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indicesMon,indicesCur,myOutName)
     mons=["CAM" "DDS"];
     planes=["hor" "ver"];
     fprintf("exporting data to file %s ...\n",myOutName);
     header=CreateHeader(LGENnames,planes);
     nPoints=size(tableIs,1);
     nColumns=size(header,2);
-    if ( size(indices,3)==1 )
-        iAdds=AlignDataIndices(indices);
-        iAdds(:,2)=iAdds(:,1);
-    else
-        iAdds=AlignDataIndices(indices(:,:,1));
-        iAdds(:,2)=AlignDataIndices(indices(:,:,1));
-    end
-    for jj=1:length(mons)
+    for iMon=1:length(mons)
+        myIndices=[indicesCur(iMon,:,:);indicesMon(iMon,:,:)];
+        iAdds=AlignDataIndices(myIndices);
         C=cell(nPoints+1,nColumns); % do not forget the header (1st row)
         C(1,:)=header;
-        C(2+iAdds(1):nPoints+1+iAdds(1),1:size(tableIs,2))=num2cell(tableIs(:,:,jj));
+        C(2+iAdds(1,1):nPoints+1+iAdds(1,1),1:size(tableIs,2))=num2cell(tableIs(:,:,iMon));
         iCol=size(tableIs,2);
-        for ll=1:length(planes) % Hor,Ver
-            if ( size(indices,3)==1 )
-                iCol=iCol+1; C(1+indices(1,1):1+indices(1,2),iCol)=num2cell(1:indices(1,2)-indices(1,1)+1)';
+        for iPlane=1:length(planes) % Hor,Ver
+            if ( size(indicesCur,3)==1 )
+                iCol=iCol+1; C(1+indicesCur(iMon,1):1+indicesCur(iMon,2),iCol)=num2cell(1:indicesCur(iMon,2)-indicesCur(iMon,1)+1)';
             else
-                iCol=iCol+1; C(1+indices(1,1,ll):1+indices(1,2,ll),iCol)=num2cell(1:indices(1,2,ll)-indices(1,1,ll)+1)';
+                iCol=iCol+1; C(1+indicesCur(iMon,1,iPlane):1+indicesCur(iMon,2,iPlane),iCol)=num2cell(1:indicesCur(iMon,2,iPlane)-indicesCur(iMon,1,iPlane)+1)';
             end
             for kk=1:3 % FWHM,BAR,INT
                 switch kk
@@ -32,10 +27,10 @@ function ExportDataOverview(tableIs,LGENnames,FWHMs,BARs,INTs,nData,indices,myOu
                     case 3
                         whatToShow=INTs;
                 end
-                iCol=iCol+1; C(2+iAdds(jj+1):nData(jj)+1+iAdds(jj+1),iCol)=num2cell(whatToShow(1:nData(jj),ll,jj));
+                iCol=iCol+1; C(2+iAdds(2,1):nData(iMon)+1+iAdds(2,1),iCol)=num2cell(whatToShow(1:nData(iMon),iPlane,iMon));
             end
         end
-        writecell(C,myOutName,'Sheet',mons(jj));
+        writecell(C,myOutName,'Sheet',mons(iMon));
     end
     fprintf("...done.\n");
 end

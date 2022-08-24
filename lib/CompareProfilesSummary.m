@@ -1,4 +1,4 @@
-function CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm)
+function CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,INTsSumm,cyProgsProf,cyProgsSumm,actPlotName)
     fprintf("comparing stats based on profiles and stats based on summary files...\n");
     if ( ~exist('cyProgsSumm','var') & exist('cyProgsProf','var') )
         warning("...you gave me cyProgs from profiles but not those from the summary! Ignoring available info...");
@@ -53,6 +53,13 @@ function CompareProfilesSummary(BARsProf,FWHMsProf,INTsProf,BARsSumm,FWHMsSumm,I
             ylabel(myYLab); grid on; title(myTit);
             if ( iCol==3 ), set(gca, 'YScale', 'log'); end
         end
+    end
+    if ( exist('actPlotName','var') )
+        MapFileOut=sprintf("%s_ProfilesVsSummary.fig",actPlotName);
+        savefig(MapFileOut);
+        % MapFileOut=sprintf("%s_RawData.png",actPlotName);
+        % exportgraphics(ff,MapFileOut,'Resolution',300); % resolution=DPI
+        fprintf("...saving to file %s ...\n",MapFileOut);
     end
     fprintf("...end.\n");
 end

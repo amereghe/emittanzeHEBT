@@ -9,7 +9,7 @@ end
 
 %% build actual paths
 currPath(iScanSetUps)=sprintf("%s\\%s",measPath,currFile(iScanSetUps));
-[filepath,name,ext]=fileparts(scanSetUps(iScanSetUps)); clear filepath name ext;
+[filepath,name,ext]=fileparts(scanSetUps(iScanSetUps));
 savePath(iScanSetUps)=sprintf("%s\\%s",filepath,plotName(iScanSetUps));
 outName(iScanSetUps)=sprintf("%s\\%s",savePath(iScanSetUps),plotName(iScanSetUps));
 % CAM/DDS paths
@@ -24,7 +24,7 @@ clear ii;
 %% largest fit range
 for iMon=1:2
     for iPlane=1:2
-        [myRange,myId]=max(fitIndices(iMon+1,2,iPlane,:,iScanSetUps)-fitIndices(iMon+1,1,iPlane,:,iScanSetUps)+1);
+        [myRange,myId]=max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-fitIndices(iMon,1,iPlane,:,iScanSetUps)+1);
         if (myRange>largestFitRange(iPlane))
             largestFitRange(iPlane,iScanSetUps)=myRange;
             iLargestFitRange(iPlane,iScanSetUps)=myId;
@@ -34,4 +34,5 @@ end
 clear iMon iPlane myrange myId;
 
 %%
+clear filepath name ext; 
 fprintf("...done\n");
