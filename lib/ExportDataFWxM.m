@@ -8,7 +8,7 @@ function ExportDataFWxM(tableIs,LGENnames,FWHMs,BARs,INTs,fracEst,nData,indicesM
     nColumns=size(header,2);
     for iMon=1:length(mons)
         myIndices=[indicesCur(iMon,:,:);indicesMon(iMon,:,:)];
-        iAdds=AlignDataIndices(myIndices);
+        iAdds=AlignDataIndices(myIndices,true);
         C=cell(nPoints+1,nColumns); % do not forget the header (1st row)
         C(1,:)=header;
         C(2+iAdds(1,1):nPoints+1+iAdds(1,1),1:size(tableIs,2))=num2cell(tableIs(:,:,iMon));
