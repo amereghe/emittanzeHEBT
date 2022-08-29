@@ -19,11 +19,11 @@ indices(1,:,iScanSetUps)=[5 44];
 indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(1);
 indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(2);
 % indices for fitting data
-clear fitIndicesH fitIndicesV;
 % - CAM
-fitIndicesH=[8 26; 9 25; 10 24; 11 23; 12 22; 13 21; 14 20]'; % symmetric, 7 couples 
+clear fitIndicesH fitIndicesV;
+fitIndicesH=[8 26; 9 25; 10 24; 11 23; 12 22; 13 21; 14 20]'; % symmetric, 7 couples (min at ID=17)
 % fitIndicesH=[7 23; 7 24; 7 25; 7 26; 8 23; 8 24; 8 25; 8 26; 9 23; 9 24; 9 25; 9 26; 10 23; 10 24; 10 25; 10 26; ]'; % asymmetric, 16 couples
-if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
+if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end % V plane: sigma oscillates around a slowly-increasing value
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);
 nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
 % - 1st col: 1=CAM (summary file), 2=DDS (summary file);
@@ -32,7 +32,7 @@ nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
 % - 4th col: fit ranges;
 fitIndices(1,:,1,1:nFitRanges(1,iScanSetUps),iScanSetUps)=fitIndicesH;
 fitIndices(1,:,2,1:nFitRanges(2,iScanSetUps),iScanSetUps)=fitIndicesV;
-% - DDS
+% - DDS (very similar to CAM, apart from ID-shift)
 fitIndices(2,:,:,:,iScanSetUps)=fitIndices(1,:,:,:,iScanSetUps)-iCurr2mon(1)+iCurr2mon(2);
 % - post processing
 fitIndices(fitIndices==0)=NaN();

@@ -16,20 +16,24 @@ if ( ~exist('DDSpaths','var') ), DDSpaths=strings(length(CAMpaths),1); DDSpaths(
 % - 1st col: 1=current, 2=CAM (summary file), 3=DDS (summary file);
 % - 2nd col: min,max;
 indices(1,:,iScanSetUps)=[5 44];
-indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)-2;
-indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)-1;
+indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(1);
+indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(2);
 % indices for fitting data
-fitIndicesH=[12 30; 13 29; 14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples
-fitIndicesV=[16 42; 17 41; 18 40; 19 39; 20 38; 21 37; 22 36]'; % VER plane, symmetric, 7 couples
+% - CAM
+clear fitIndicesH fitIndicesV;
+fitIndicesH=[12 30; 13 29; 14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples (min at ID=21)
+fitIndicesV=[18 42; 19 41; 20 40; 21 39; 22 38; 24 36; 26 34]'; % VER plane, symmetric, 7 couples (min at ID=30)
 if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);
 nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
-% - 1st col: 1=current, 2=CAM (summary file), 3=DDS (summary file);
+% - 1st col: 1=CAM (summary file), 2=DDS (summary file);
 % - 2nd col: min,max;
 % - 3rd col: hor,ver;
 % - 4th col: fit ranges;
-fitIndices(2,:,1,1:nFitRanges(1,iScanSetUps),iScanSetUps)=fitIndicesH;
-fitIndices(2,:,2,1:nFitRanges(2,iScanSetUps),iScanSetUps)=fitIndicesV;
+fitIndices(1,:,1,1:nFitRanges(1,iScanSetUps),iScanSetUps)=fitIndicesH;
+fitIndices(1,:,2,1:nFitRanges(2,iScanSetUps),iScanSetUps)=fitIndicesV;
+% - DDS (very similar to CAM, apart from ID-shift)
+fitIndices(2,:,:,:,iScanSetUps)=fitIndices(1,:,:,:,iScanSetUps)-iCurr2mon(1)+iCurr2mon(2);
+% - post processing
 fitIndices(fitIndices==0)=NaN();
-fitIndices(1,:,:,:,iScanSetUps)=fitIndices(2,:,:,:,iScanSetUps)+2;
-fitIndices(3,:,:,:,iScanSetUps)=fitIndices(2,:,:,:,iScanSetUps)+1;
+clear fitIndicesH fitIndicesV;

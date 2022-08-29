@@ -21,8 +21,8 @@ indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)-1;
 % indices for fitting data
 clear fitIndicesH fitIndicesV;
 % - CAM
-fitIndicesH=[  9 37; 12 34; 15 31; 18 28; 19 27; 20 26]'; % HOR plane, waist at ID=23, symmetric, 6 couples
-fitIndicesV=[  4 32;  7 29; 10 26; 13 23; 14 22; 15 21]'; % VER plane, waist at ID=18, symmetric, 6 couples
+fitIndicesH=[  5 41;  9 37; 13 33; 17 29; 18 28; 19 27]'; % HOR plane, symmetric, 6 couples (min at ID=23)
+fitIndicesV=[  4 32;  7 29; 10 26; 13 23; 14 22; 15 21]'; % VER plane, symmetric, 6 couples (min at ID=18)
 if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);
 nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
@@ -33,7 +33,8 @@ nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
 fitIndices(1,:,1,1:nFitRanges(1,iScanSetUps),iScanSetUps)=fitIndicesH;
 fitIndices(1,:,2,1:nFitRanges(2,iScanSetUps),iScanSetUps)=fitIndicesV;
 % - DDS
-fitIndices(2,:,:,:,iScanSetUps)=fitIndices(1,:,:,:,iScanSetUps)-iCurr2mon(1)+iCurr2mon(2);
+fitIndices(2,:,1,1:nFitRanges(1,iScanSetUps),iScanSetUps)=fitIndicesH;
+fitIndices(2,:,2,1:nFitRanges(2,iScanSetUps),iScanSetUps)=fitIndicesV+2;
 % - post processing
 fitIndices(fitIndices==0)=NaN();
 clear fitIndicesH fitIndicesV;
