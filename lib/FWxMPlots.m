@@ -1,14 +1,6 @@
 function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,actPlotName)
     fprintf("plotting FWxM data (scan plots)...\n");
-    if ( exist('actPlotName','var') )
-        ff = figure('visible','off');
-        % increase by 10 figure dimensions
-        ff.Position(1:2)=ff.Position(1:2)/20.;
-        ff.Position(3)=ff.Position(3)*4;
-        ff.Position(4)=ff.Position(4)*2;
-    else
-        figure();
-    end
+    figure();
     nMons=2;
     nPlotsPerMon=5;
     nLevels=size(FWHMs,4);
@@ -62,9 +54,9 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
     sgtitle(scanDescription);
     linkaxes(ax,"x");
     if ( exist('actPlotName','var') )
-        MapFileOut=sprintf("%s_scans_FWxM.png",actPlotName);
+        MapFileOut=sprintf("%s_scans_FWxM.fig",actPlotName);
+        savefig(MapFileOut);
         fprintf("...saving to file %s ...\n",MapFileOut);
-        exportgraphics(ff,MapFileOut,'Resolution',300); % resolution=DPI
     end
     fprintf("...done.\n");
 end
