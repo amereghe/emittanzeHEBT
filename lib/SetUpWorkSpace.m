@@ -25,7 +25,7 @@ clear ii;
 for iMon=1:2
     for iPlane=1:2
         [myRange,myId]=max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-fitIndices(iMon,1,iPlane,:,iScanSetUps)+1);
-        if (myRange>largestFitRange(iPlane))
+        if (myRange>largestFitRange(iPlane,iScanSetUps))
             largestFitRange(iPlane,iScanSetUps)=myRange;
             iLargestFitRange(iPlane,iScanSetUps)=myId;
         end
