@@ -37,15 +37,15 @@ config="TM"; % select configuration: TM, RFKO
 
 scanSetUps=[
     "2022-03-13\SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U1p018ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U2p006ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
     "2022-03-13\SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
-%     "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
-%     "2022-03-13\SetMeUp_U1p018ApQUE_C270_secondoGiro.m"
-%     "2022-03-13\SetMeUp_U2p006ApQUE_C270_secondoGiro.m"
-%     "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
     ];
 % - scan infos
 nScanSetUps=length(scanSetUps);
-iMinScanSetUps=1; iMaxScanSetUps=nScanSetUps;
+iMinScanSetUps=1; iMaxScanSetUps=nScanSetUps; % iMinScanSetUps=1; iMaxScanSetUps=1;
 
 % - processing
 lAnalyseOnly=false;
@@ -76,6 +76,9 @@ LPOWmonPaths=strings(length(LPOWlogFiles),1);
 for ii=1:length(LPOWlogFiles)
     LPOWmonPaths(ii)=sprintf("%s\\%s",LPOWmonPath,LPOWlogFiles(ii));
 end
+
+%% main - gatherings
+run("2022-03-13\gatherings_secondoGiro_All.m");
 
 %% main - parse data files
 
@@ -137,10 +140,12 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     nDataCurr=ExpandMat(nDataCurr,tmpNDataCurr); clear tmpNDataCurr;
     tableIs=ExpandMat(tableIs,tmpTableIs); clear tmpTableIs;
 end
+fprintf("...end of data parsing;\n");
 
 %% main - cross checks
 if ( ~lAnalyseOnly )
     for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+    % for iScanSetUps=2:2
         % - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
         % ShowScanRawPlots(IsXLS(1:nDataCurr(iScanSetUps),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),INTsSumm(:,:,:,iScanSetUps),nDataSumm(:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"]);
         % ShowScanRawPlots(IsXLS(1:nDataCurr(iScanSetUps),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),INTsProf(:,:,:,iScanSetUps),nDataProf(:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
@@ -152,33 +157,35 @@ if ( ~lAnalyseOnly )
         if ( ~ismissing(LGENsLPOWMon) )
             CompareCurrents(IsXLS(:,:,iScanSetUps),indices(:,:,iScanSetUps),LGENscanned(iScanSetUps),appValsLPOWMon,LGENsLPOWMon,allLGENs,tableIs(:,:,:,iScanSetUps),cyProgsSumm(:,:,iScanSetUps),cyProgsLPOWMon); % indices are based on summary data
         end
+        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
         % - plot distributions (3D visualisation)
         myOutName=sprintf("%s_3D_aligned.fig",outName(iScanSetUps)); myRemark="aligned distributions";
-        [indicesMon,indicesCur]=GenIndices(indices(2:3,:,iScanSetUps),iCurr2mon);
+        [indicesMon,indicesCur]=GenIndices(indices(2:3,:,iScanSetUps),myCurr2mon);
         ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark,IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),indicesMon,indicesCur);
         clear indicesMon indicesCur;
+        myOutName=sprintf("%s_3D_allIDs.fig",outName(iScanSetUps)); myRemark="all distributions";
+        ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark);
         % for iFitSet=1:nFitSets
         %     myOutName=sprintf("%s_3D_fitDistributions_%02d.fig",outName(iScanSetUps),iFitSet); myRemark=sprintf("distributions to be fitted (set # %2i)",iFitSet);
         %     ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark,IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),fitIndices(:,:,:,iFitSet,iScanSetUps));
         % end
         if ( iLargestFitRange(1,iScanSetUps)==iLargestFitRange(2,iScanSetUps) )
-            [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(1,iScanSetUps),iScanSetUps),iCurr2mon);
+            [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(1,iScanSetUps),iScanSetUps),myCurr2mon);
             myOutName=sprintf("%s_3D_fitDistributions_largestFitRange.fig",outName(iScanSetUps)); myRemark=sprintf("distributions to be fitted (largest set: # %2i)",iLargestFitRange(1,iScanSetUps));
             ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark,IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),indicesMon,indicesCur);
             clear indicesMon indicesCur;
         else
             for iPlane=1:2
-                [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(iPlane,iScanSetUps),iScanSetUps),iCurr2mon);
+                [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(iPlane,iScanSetUps),iScanSetUps),myCurr2mon);
                 myOutName=sprintf("%s_3D_fitDistributions_largestFitRange_%s.fig",outName(iScanSetUps),planes(iPlane)); myRemark=sprintf("distributions to be fitted (largest set on %s plane: # %2i)",planes(iPlane),iLargestFitRange(iPlane,iScanSetUps));
                 ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark,IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),indicesMon,indicesCur);
                 clear indicesMon indicesCur;
             end
             clear iPlane;
         end
-        myOutName=sprintf("%s_3D_allIDs.fig",outName(iScanSetUps)); myRemark="all distributions";
-        ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark);
     end
 end
+fprintf("...end of cross checks;\n");
 
 %% main - actual analysis
 [BARsProfScan,FWHMsProfScan,INTsProfScan]=deal(missing(),missing(),missing());
@@ -188,43 +195,6 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     [tmpBARsProfScan,tmpFWHMsProfScan,tmpINTsProfScan]=ComputeDistStats(profiles(:,:,:,:,iScanSetUps),fracEst);
     % - reduced values for FWxMs:
     [tmpReducedFWxM]=GetReducedFWxM(tmpFWHMsProfScan,fracEst);
-    
-    if ( ~lAnalyseOnly )
-        % - actual plots (FWHM and baricentre vs Iscan (actual range), CAMeretta and DDS)
-        % ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
-        ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
-        ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"]);
-        % - export data to xlsx files
-        [indicesMon,indicesCur]=GenIndices(indices(2:3,:,iScanSetUps),iCurr2mon);
-        % myOutName=sprintf("%s_SummaryData.xlsx",outName(iScanSetUps)); ExportDataOverview(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),INTsSumm(:,:,:,iScanSetUps),nDataSumm(:,iScanSetUps),indicesMon,indicesCur,myOutName);
-        myOutName=sprintf("%s_ProfStatsData.xlsx",outName(iScanSetUps)); ExportDataOverview(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),INTsProf(:,:,:,iScanSetUps),nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
-        clear indicesMon indicesCur;
-        % - show statistics on profiles at different heights
-        FWxMPlots(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),tmpFWHMsProfScan,tmpBARsProfScan,tmpReducedFWxM,fracEst,indices(:,:,iScanSetUps),scanDescription(iScanSetUps),outName(iScanSetUps));
-        % - export data to xlsx files
-        %   NB: integrals are from the summary files, whereas the other quantities come from the analysis on the profiles...
-        % for iFitSet=1:nFitSets
-        %     [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iFitSet,iScanSetUps),iCurr2mon);
-        %     myOutName=sprintf("%s_FWxM_%02d.xlsx",outName(iScanSetUps),iFitSet); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpFWHMsProfScan,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
-        %     myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName(iScanSetUps),iFitSet); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpReducedFWxM,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
-        %     clear indicesMon indicesCur;
-        % end
-        if ( iLargestFitRange(1,iScanSetUps)==iLargestFitRange(2,iScanSetUps) )
-            [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(1,iScanSetUps),iScanSetUps),iCurr2mon);
-            myOutName=sprintf("%s_FWxM_largestFitRange.xlsx",outName(iScanSetUps)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpFWHMsProfScan,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
-            myOutName=sprintf("%s_SIGxM_largestFitRange.xlsx",outName(iScanSetUps)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpReducedFWxM,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
-            clear indicesMon indicesCur;
-        else
-            for iPlane=1:2
-                [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(iPlane,iScanSetUps),iScanSetUps),iCurr2mon);
-                myOutName=sprintf("%s_FWxM_largestFitRange_%s.xlsx",outName(iScanSetUps),planes(iPlane)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpFWHMsProfScan,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
-                myOutName=sprintf("%s_SIGxM_largestFitRange_%s.xlsx",outName(iScanSetUps),planes(iPlane)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,tmpReducedFWxM,tmpBARsProfScan,INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
-                clear indicesMon indicesCur;
-            end
-            clear iPlane;
-        end
-    end
-    
     % - store data:
     %   . profiles:
     BARsProfScan=ExpandMat(BARsProfScan,tmpBARsProfScan); clear tmpBARsProfScan;
@@ -232,6 +202,46 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     INTsProfScan=ExpandMat(INTsProfScan,tmpINTsProfScan); clear tmpINTsProfScan;
     ReducedFWxM=ExpandMat(ReducedFWxM,tmpReducedFWxM); clear tmpReducedFWxM;
 end
+if ( ~lAnalyseOnly )
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+    % for iScanSetUps=2:2
+        % - actual plots (FWHM and baricentre vs Iscan (actual range), CAMeretta and DDS)
+        % ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
+        ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
+        % ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"]);
+        % - export data to xlsx files
+        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
+        [indicesMon,indicesCur]=GenIndices(indices(2:3,:,iScanSetUps),myCurr2mon);
+        % myOutName=sprintf("%s_SummaryData.xlsx",outName(iScanSetUps)); ExportDataOverview(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),INTsSumm(:,:,:,iScanSetUps),nDataSumm(:,iScanSetUps),indicesMon,indicesCur,myOutName);
+        myOutName=sprintf("%s_ProfStatsData.xlsx",outName(iScanSetUps)); ExportDataOverview(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),INTsProf(:,:,:,iScanSetUps),nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
+        clear indicesMon indicesCur;
+        % - show statistics on profiles at different heights
+        FWxMPlots(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProfScan(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),ReducedFWxM(:,:,:,:,iScanSetUps),fracEst,indices(:,:,iScanSetUps),scanDescription(iScanSetUps),outName(iScanSetUps));
+        % - export data to xlsx files
+        %   NB: integrals are from the summary files, whereas the other quantities come from the analysis on the profiles...
+        % for iFitSet=1:nFitSets
+        %     [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iFitSet,iScanSetUps),myCurr2mon);
+        %     myOutName=sprintf("%s_FWxM_%02d.xlsx",outName(iScanSetUps),iFitSet); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsProfScan(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
+        %     myOutName=sprintf("%s_SIGxM_%02d.xlsx",outName(iScanSetUps),iFitSet); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,ReducedFWxM(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
+        %     clear indicesMon indicesCur;
+        % end
+        if ( iLargestFitRange(1,iScanSetUps)==iLargestFitRange(2,iScanSetUps) )
+            [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(1,iScanSetUps),iScanSetUps),myCurr2mon);
+            myOutName=sprintf("%s_FWxM_largestFitRange.xlsx",outName(iScanSetUps)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsProfScan(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
+            myOutName=sprintf("%s_SIGxM_largestFitRange.xlsx",outName(iScanSetUps)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,ReducedFWxM(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
+            clear indicesMon indicesCur;
+        else
+            for iPlane=1:2
+                [indicesMon,indicesCur]=GenIndices(fitIndices(:,:,:,iLargestFitRange(iPlane,iScanSetUps),iScanSetUps),myCurr2mon);
+                myOutName=sprintf("%s_FWxM_largestFitRange_%s.xlsx",outName(iScanSetUps),planes(iPlane)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,FWHMsProfScan(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName);
+                myOutName=sprintf("%s_SIGxM_largestFitRange_%s.xlsx",outName(iScanSetUps),planes(iPlane)); ExportDataFWxM(tableIs(:,:,:,iScanSetUps),allLGENs,ReducedFWxM(:,:,:,:,iScanSetUps),BARsProfScan(:,:,:,iScanSetUps),INTsMapped(:,:,:,iScanSetUps),fracEst,nDataProf(:,iScanSetUps),indicesMon,indicesCur,myOutName,true);
+                clear indicesMon indicesCur;
+            end
+            clear iPlane;
+        end
+    end
+end
+fprintf("...end of actual analysis;\n");
 
 %% export MADX table, to compute response matrices of scan
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
@@ -245,6 +255,7 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     end
     clear iMon;
 end
+fprintf("...end of exporting to MADX files;\n");
 
 %% read MADX tfs table with response matrices of scan
 TM=missing();
@@ -264,12 +275,14 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     % store data
     TM=ExpandMat(TM,tmpTM); clear tmpTM;
 end
+fprintf("...end of reading MADX files;\n");
 
 %% fit data
 % sigdpp=0:5E-5:1E-3;
 % sigdpp=0:1E-3:1E-3;
 sigdpp=[ 0.0 1E-3 ]; sigdppStrings=compose("sigdpp=%g",sigdpp);
 labelsType=[ "EMI_RMS" "EMI_HWxM" ];
+myYlabels=[ "\sigma [mm]" "HWxM [mm]" ];
 clear beta0 alpha0 emiG z pz dz dpz avedpp TT SS;
 beta0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
 alpha0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
@@ -283,14 +296,15 @@ TT=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType)
 SS=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     for iMon=1:nMons
+        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
         for iPlane=1:length(planes)
             for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
                 % - range of data set to consider:
                 iMinFit=fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps);
                 iMaxFit=fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps);
                 % - corresponding range in current:
-                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMinFit-iCurr2mon(iMon));
-                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMaxFit-iCurr2mon(iMon));
+                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMinFit-myCurr2mon(iMon));
+                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMaxFit-myCurr2mon(iMon));
                 nFit=iMaxFit-iMinFit+1;
                 for iFrac=1:length(fracEst)
                     for iType=1:length(labelsType)
@@ -310,27 +324,63 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
                 end
             end
         end
-        % for iType=1:2
-        %     for iPlane=1:length(planes)
-        %         for iFitSet=1:nFitSets
-        %             ShowFittedOpticsFunctions(beta0(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),emiG(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),sigdpp,planes(iPlane),fracEstStrings);
-        %             ShowFittedOrbits(z(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),planes(iPlane),avedpp(:,iPlane,iFitSet,iType,iMon,iScanSetUps),fracEstStrings);
-        %         end
-        %     end
-        % end
-        if ( ~lAnalyseOnly )
-            ShowFittedOpticsFunctionsGrouped(...
-                beta0(:,:,:,:,:,iMon,iScanSetUps),alpha0(:,:,:,:,:,iMon,iScanSetUps),emiG(:,:,:,:,:,iMon,iScanSetUps),...
-                dz(:,:,:,:,:,iMon,iScanSetUps),dpz(:,:,:,:,:,iMon,iScanSetUps),...
-                z(:,:,:,:,:,iMon,iScanSetUps),pz(:,:,:,:,:,iMon,iScanSetUps),...
-                1-fracEst,"1-frac []",planes,compose("fit set #%2d",1:nMaxFitSets),...
-                sigdppStrings,labelsType,scanDescription(iScanSetUps),mons(iMon),nFitRanges(:,iScanSetUps),outName(iScanSetUps));
-            ShowFittedEllipsesGrouped(...
-                beta0(:,:,:,:,:,iMon,iScanSetUps),alpha0(:,:,:,:,:,iMon,iScanSetUps),emiG(:,:,:,:,:,iMon,iScanSetUps),...
-                planes,compose("fit set #%2d",1:nMaxFitSets),fracEstStrings,sigdppStrings,labelsType,scanDescription(iScanSetUps),mons(iMon),nFitRanges(:,iScanSetUps),outName(iScanSetUps));
+    end
+end
+if ( ~lAnalyseOnly )
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+        for iMon=1:nMons
+            % for iType=1:2
+            %     for iPlane=1:length(planes)
+            %         for iFitSet=1:nFitSets
+            %             ShowFittedOpticsFunctions(beta0(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),emiG(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),sigdpp,planes(iPlane),fracEstStrings);
+            %             ShowFittedOrbits(z(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,:,iPlane,iFitSet,iType,iMon,iScanSetUps),planes(iPlane),avedpp(:,iPlane,iFitSet,iType,iMon,iScanSetUps),fracEstStrings);
+            %         end
+            %     end
+            % end
+            % - show optics
+            for iPlane=1:length(planes)
+                for iType=1:length(labelsType)
+                    for iSigDpp=1:length(sigdppStrings)
+                        % permute dimensions: showBeta0(fracEst,nMaxFitSets,length(planes),iSigDpp)
+                        clear showBeta0; showBeta0=permute(beta0(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]); 
+                        clear showAlpha0; showAlpha0=permute(alpha0(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        clear showEmiG; showEmiG=permute(emiG(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        clear showDz; showDz=permute(dz(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        clear showDpz; showDpz=permute(dpz(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        clear showZ; showZ=permute(z(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        clear showPz; showPz=permute(pz(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
+                        myTitle=sprintf("%s - %s - %s plane - %s - %s",scanDescription(iScanSetUps),mons(iMon),planes(iPlane),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane)); 
+                        else
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane),sigdppStrings(iSigDpp)); 
+                        end
+                        ShowFittedOpticsFunctionsGrouped(showBeta0,showAlpha0,showEmiG,showDz,showDpz,showZ,showPz,...
+                            1-fracEst,"1-frac []",compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
+                    end
+                end
+            end
+            % - show ellypses
+            for iType=1:length(labelsType)
+                for iSigDpp=1:length(sigdppStrings)
+                    % permute dimensions: showBeta0(fracEst,nMaxFitSets,length(planes),iSigDpp)
+                    clear showBeta0; showBeta0=permute(beta0(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]); 
+                    clear showAlpha0; showAlpha0=permute(alpha0(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]);
+                    clear showEmiG; showEmiG=permute(emiG(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]);
+                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                    if ( sigdpp(iSigDpp)==0.0 )
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    else
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                    end
+                    ShowFittedEllipsesGrouped(showBeta0,showAlpha0,showEmiG,nFitRanges(:,iScanSetUps),...
+                        planes,compose("fit set #%2d",1:nMaxFitSets),fracEstStrings,myTitle,myOutName);
+                end
+            end
         end
     end
 end
+fprintf("...end of fitting;\n");
 
 %% compare fits and measured data
 clear gamma0; gamma0=(1+alpha0.^2)./beta0; % same size as alpha0 and beta0
@@ -342,12 +392,13 @@ clear measBARs; measBARs=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
 clear measCurr; measCurr=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     for iMon=1:nMons
+        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
         for iPlane=1:length(planes)
             % - transport optics
             for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
                 % - range of data set to consider:
-                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps)-iCurr2mon(iMon));
-                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps)-iCurr2mon(iMon));
+                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
+                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
                 nFit=jMaxFit-jMinFit+1;
                 for iFrac=1:length(fracEst)
                     for iType=1:length(labelsType)
@@ -378,8 +429,8 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
             iMinFit=min(fitIndices(iMon,1,iPlane,:,iScanSetUps));
             iMaxFit=max(fitIndices(iMon,2,iPlane,:,iScanSetUps));
             %   corresponding range in current:
-            jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==min(fitIndices(iMon,1,iPlane,:,iScanSetUps)-iCurr2mon(iMon)));
-            jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-iCurr2mon(iMon)));
+            jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==min(fitIndices(iMon,1,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
+            jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
             nFit=iMaxFit-iMinFit+1;
             for iType=1:length(labelsType)
                 if ( strcmpi(labelsType(iType),"EMI_RMS") )
@@ -393,16 +444,101 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
             measCurr(1:nFit,iPlane,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
         end
         if ( ~lAnalyseOnly )
-            CompareFits(calcSigmas(:,:,:,:,:,:,iMon,iScanSetUps),scanCurrents(:,:,:,iMon,iScanSetUps),measSigma(:,:,:,:,iMon,iScanSetUps),measCurr(:,:,iMon,iScanSetUps),"SIG",...
-                sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),compose("fit set #%2d",1:nMaxFitSets),labelsType,...
-                scanDescription(iScanSetUps),mons(iMon),nFitRanges(:,iScanSetUps),outName(iScanSetUps));
-            CompareFits(calcBars(:,:,:,:,:,:,iMon,iScanSetUps),scanCurrents(:,:,:,iMon,iScanSetUps),measBARs(:,:,iMon,iScanSetUps),measCurr(:,:,iMon,iScanSetUps),"BAR",...
-                sigdppStrings,fracEstStrings,planes,sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),compose("fit set #%2d",1:nMaxFitSets),labelsType,...
-                scanDescription(iScanSetUps),mons(iMon),nFitRanges(:,iScanSetUps),outName(iScanSetUps));
+            % - compare SIGs
+            for iType=1:length(labelsType)
+                for iSigDpp=1:length(sigdppStrings)
+                    % permute dimensions:
+                    clear showCalcSigma; showCalcSigma=permute(calcSigmas(:,iSigDpp,:,:,:,iType,iMon,iScanSetUps),[1 4 5 3 2]); % showCalcSigma(nMaxFitData,length(planes),nMaxFitSets,fracEst,iSigDpp)
+                    clear showScanCurrents; showScanCurrents=scanCurrents(:,:,:,iMon,iScanSetUps); % showScanCurrents(nMaxFitData,length(planes),nMaxFitSets)
+                    clear showMeasSigma; showMeasSigma=measSigma(:,:,:,iType,iMon,iScanSetUps); % showMeasSigma(nMaxFitData,length(planes),fracEst)
+                    clear showMeasCurr; showMeasCurr=measCurr(:,:,iMon,iScanSetUps); % showMeasCurr(nMaxFitData,length(planes))
+                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                    if ( sigdpp(iSigDpp)==0.0 )
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    else
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                    end
+                    CompareFits(showCalcSigma,showScanCurrents,showMeasSigma,showMeasCurr,"SIG",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),myYlabels(iType),...
+                        fracEstStrings,planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),myOutName);
+                end
+            end
+            % - compare BARs
+            for iType=1:length(labelsType)
+                for iSigDpp=1:length(sigdppStrings)
+                    % permute dimensions:
+                    clear showCalcBars; showCalcBars=permute(calcBars(:,iSigDpp,1,:,:,iType,iMon,iScanSetUps),[1 4 5 3 2]); % showCalcBars(nMaxFitData,length(planes),nMaxFitSets,1,iSigDpp)
+                    clear showScanCurrents; showScanCurrents=scanCurrents(:,:,:,iMon,iScanSetUps); % showScanCurrents(nMaxFitData,length(planes),nMaxFitSets)
+                    clear showMeasBars; showMeasBars=measBARs(:,:,iMon,iScanSetUps); % showMeasBars(nMaxFitData,length(planes))
+                    clear showMeasCurr; showMeasCurr=measCurr(:,:,iMon,iScanSetUps); % showMeasCurr(nMaxFitData,length(planes))
+                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                    if ( sigdpp(iSigDpp)==0.0 )
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    else
+                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                    end
+                    CompareFits(showCalcBars,showScanCurrents,showMeasBars,showMeasCurr,"BAR",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),"BAR [mm]",...
+                        "all fractions",planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),myOutName);
+                end
+            end
         end
     end
 end
+fprintf("...end of comparing fit results and measurements;\n");
 
+%% superimpose plots
+iSigDpp=find(sigdpp==0); iPlane=find(strcmpi(planes,"HOR")); iType=find(strcmpi(labelsType,"EMI_HWxM")); iMon=find(strcmpi(mons,"CAM"));
+% re-map data: (fractEst,(iScanSetUps-1)*nMaxFitSets+iFitSet)
+clear showBeta0; showBeta0=reshape(beta0(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showAlpha0; showAlpha0=reshape(alpha0(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showEmiG; showEmiG=reshape(emiG(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showDz; showDz=reshape(dz(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showDpz; showDpz=reshape(dpz(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showZ; showZ=reshape(z(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+clear showPz; showPz=reshape(pz(iSigDpp,:,iPlane,:,iType,iMon,:),length(fracEst),nMaxFitSets*nScanSetUps);
+myTitle=sprintf("%s - %s - %s plane - %s - %s","all scans/fits",mons(iMon),planes(iPlane),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+myLegends=strings(nMaxFitSets*nScanSetUps,1);
+for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+    myLegends((iScanSetUps-1)*nMaxFitSets+1:(iScanSetUps-1)*nMaxFitSets+nMaxFitSets)=scanDescription(iScanSetUps)+compose("fit set #%2d",1:nMaxFitSets);
+end
+ShowFittedOpticsFunctionsGrouped(showBeta0,showAlpha0,showEmiG,showDz,showDpz,showZ,showPz,...
+    1-fracEst,"1-frac []",myLegends,myTitle);%,myOutName);
+% figure();
+% plot(fracEst,showEmiG(:,:),".-");
+fprintf("...end of comparisons-1;\n");
+
+%% superimpose plots - take 2
+iSigDpp=find(sigdpp==0); iType=find(strcmpi(labelsType,"EMI_RMS")); % iPlane=strcmpi(planes,"HOR");
+% whats=[ "\beta" "\alpha" "\epsilon" ];
+% whatsFigure=[ "BETA" "ALPHA" "EPSILON" ];
+% whatDims=[ "[m]" "[]" "[\mum]" ];
+whats=[ "\epsilon" ];
+whatDims=[ "[\mum]" ];
+whatsFigure=[ "EPSILON" ];
+for iPlane=1:length(planes)
+    for iWhat=1:length(whats)
+        myTitle=sprintf("compare %s - %s plane - %s - %s",whats(iWhat),planes(iPlane),LabelMe(labelsType(iType)),sigdppStrings(iSigDpp));
+        clear showMe;
+        switch upper(whats(iWhat))
+            case "\BETA"
+                showMe=permute(beta0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 6 7 1 3 5]);
+            case "\ALPHA"
+                showMe=permute(alpha0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 6 7 1 3 5]);
+            case "\EPSILON"
+                showMe=permute(emiG(iSigDpp,:,iPlane,:,iType,:,:)*1E6,[2 4 6 7 1 3 5]);
+            otherwise
+                error("Wrong what! %s",whats(iWhat));
+        end
+        if ( sigdpp(iSigDpp)==0.0 )
+            myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane)); 
+        else
+            myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
+        end
+        % CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims(iWhat),mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName,lKeepFrac,lKeepFits);
+        CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims(iWhat),mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
+    end
+end
+fprintf("...end of comparisons-2;\n");
+        
 %%
 iFrac=4; iPlane=1;
 % myAlpha0=(-10:0.5:10)'; myBeta0=50*ones(length(myAlpha0),1);
@@ -414,6 +550,13 @@ myCalcSigma=sqrt(myBetaO.*myEmig);
 CompareFits(myCalcSigma,SS(:,iFrac,iPlane),compose("\\beta=%g",myBeta0),fracEstStrings,planes(iPlane),scanCurrents,sprintf("I_{%s} [A]",LGENscanned));
 
 %% local functions
+function myCurr2mon=GetMyCurr2mon(iCurr2mon,indices)
+    myCurr2mon=NaN(size(iCurr2mon));
+    for iMon=1:length(iCurr2mon)
+        myCurr2mon(iMon)=indices(iMon+1)-indices(1);
+    end
+end
+
 function MappedQuant=MapMe(myQuantProf,myQuantSumm,cyProgsProf,cyProgsSumm)
     MappedQuant=NaN(size(myQuantProf));
     for iMon=1:size(cyProgsSumm,2)
