@@ -1,4 +1,4 @@
-fprintf("setting up data in %s - desc: %s ...\n",path(iScanSetUps),description(iScanSetUps));
+fprintf("setting up data in %s - scanDesc: %s ...\n",path(iScanSetUps),scanDescription(iScanSetUps));
 
 %% some consistency checks of user input
 if ( sum(strcmpi(allLGENs,LGENscanned(iScanSetUps)))==0 )
@@ -11,6 +11,10 @@ end
 currPath(iScanSetUps)=sprintf("%s\\%s",measPath,currFile(iScanSetUps));
 [filepath,name,ext]=fileparts(scanSetUps(iScanSetUps));
 savePath(iScanSetUps)=sprintf("%s\\%s",filepath,plotName(iScanSetUps));
+if not(isfolder(savePath(iScanSetUps)))
+    warning("...creating folder %s...",savePath(iScanSetUps));
+    mkdir(savePath(iScanSetUps));
+end
 outName(iScanSetUps)=sprintf("%s\\%s",savePath(iScanSetUps),plotName(iScanSetUps));
 % CAM/DDS paths
 for ii=1:length(CAMpaths)
