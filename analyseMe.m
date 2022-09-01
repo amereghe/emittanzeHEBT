@@ -17,7 +17,7 @@ LPOWmonPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY\LPOW_error_log"
 % LPOWmonPath="S:\Accelerating-System\Accelerator-data\Area dati MD\LPOWmonitor\ErrorLog";
 % fracEst=[ 0.875 0.75 0.625 0.5 0.375 0.25 ]; % initial
 % fracEst=[ 0.875 0.8125 0.75 0.6875 0.625 0.5625 0.5 0.4375 0.375 0.3125 0.25 ]; % very detailed
-fracEst=[ 0.85 0.75 0.65 0.55 0.45 0.35 0.25 ]; % 
+fracEst=[ 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 ]; % 
 fracEstStrings=compose("frac=%g%%",fracEst*100);
 
 mons=["CAM" "DDS"]; nMons=length(mons);
@@ -36,19 +36,28 @@ machine="LineU";
 config="TM"; % select configuration: TM, RFKO
 
 scanSetUps=[
-    "2022-03-13\SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
-    "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
-    "2022-03-13\SetMeUp_U1p018ApQUE_C270_secondoGiro.m"
-    "2022-03-13\SetMeUp_U2p006ApQUE_C270_secondoGiro.m"
-    "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
-    "2022-03-13\SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
+    "2022-03-13\SetMeUp_U1p008ApQUE_C270_primoGiro.m"
+    "2022-03-13\SetMeUp_U1p014ApQUE_C270_primoGiro.m"
+    "2022-03-13\SetMeUp_U1p018ApQUE_C270_primoGiro.m"
+    "2022-03-13\SetMeUp_U2p006ApQUE_C270_primoGiro.m"
+    "2022-03-13\SetMeUp_U2p010ApQUE_C270_primoGiro.m"
+    "2022-03-13\SetMeUp_U2p016ApQUE_C270_primoGiro.m"
     ];
+% scanSetUps=[
+%     "2022-03-13\SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U1p018ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U2p006ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
+%     "2022-03-13\SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
+%     ];
 % - scan infos
 nScanSetUps=length(scanSetUps);
 iMinScanSetUps=1; iMaxScanSetUps=nScanSetUps; % iMinScanSetUps=1; iMaxScanSetUps=1;
 
 % - processing
-lAnalyseOnly=false;
+lAnalyse=true;
+lPlot=true;
 
 %% main - load infos
 % - indices in measurements (CAM/DDS summary files):
@@ -68,7 +77,7 @@ nFitRanges=NaN(2,nScanSetUps);
 % - load measuerement infos
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     run(scanSetUps(iScanSetUps));
-    run("lib\SetUpWorkSpace.m");
+    run("SetUpWorkSpace.m");
 end
 nMaxFitSets=size(fitIndices,4);
 % - LPOW paths
@@ -78,7 +87,8 @@ for ii=1:length(LPOWlogFiles)
 end
 
 %% main - gatherings
-run("2022-03-13\gatherings_secondoGiro_All.m");
+run("2022-03-13\gatherings_primoGiro_All.m");
+% run("2022-03-13\gatherings_secondoGiro_All.m");
 
 %% main - parse data files
 
@@ -143,9 +153,8 @@ end
 fprintf("...end of data parsing;\n");
 
 %% main - cross checks
-if ( ~lAnalyseOnly )
+if ( lPlot )
     for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
-    % for iScanSetUps=2:2
         % - raw plots (ie CAM/DDS: FWHM, bar and integral vs ID; scanned quad: I vs ID), to get indices
         % ShowScanRawPlots(IsXLS(1:nDataCurr(iScanSetUps),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),INTsSumm(:,:,:,iScanSetUps),nDataSumm(:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"]);
         % ShowScanRawPlots(IsXLS(1:nDataCurr(iScanSetUps),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),INTsProf(:,:,:,iScanSetUps),nDataProf(:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
@@ -157,8 +166,8 @@ if ( ~lAnalyseOnly )
         if ( ~ismissing(LGENsLPOWMon) )
             CompareCurrents(IsXLS(:,:,iScanSetUps),indices(:,:,iScanSetUps),LGENscanned(iScanSetUps),appValsLPOWMon,LGENsLPOWMon,allLGENs,tableIs(:,:,:,iScanSetUps),cyProgsSumm(:,:,iScanSetUps),cyProgsLPOWMon); % indices are based on summary data
         end
-        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
         % - plot distributions (3D visualisation)
+        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
         myOutName=sprintf("%s_3D_aligned.fig",outName(iScanSetUps)); myRemark="aligned distributions";
         [indicesMon,indicesCur]=GenIndices(indices(2:3,:,iScanSetUps),myCurr2mon);
         ShowParsedDistributions(profiles(:,:,:,:,iScanSetUps),LGENscanned(iScanSetUps),myOutName,myRemark,IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),indicesMon,indicesCur);
@@ -188,23 +197,24 @@ end
 fprintf("...end of cross checks;\n");
 
 %% main - actual analysis
-[BARsProfScan,FWHMsProfScan,INTsProfScan]=deal(missing(),missing(),missing());
-ReducedFWxM=missing();
-for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
-    % - compute statistics on profiles at different heights
-    [tmpBARsProfScan,tmpFWHMsProfScan,tmpINTsProfScan]=ComputeDistStats(profiles(:,:,:,:,iScanSetUps),fracEst);
-    % - reduced values for FWxMs:
-    [tmpReducedFWxM]=GetReducedFWxM(tmpFWHMsProfScan,fracEst);
-    % - store data:
-    %   . profiles:
-    BARsProfScan=ExpandMat(BARsProfScan,tmpBARsProfScan); clear tmpBARsProfScan;
-    FWHMsProfScan=ExpandMat(FWHMsProfScan,tmpFWHMsProfScan); clear tmpFWHMsProfScan;
-    INTsProfScan=ExpandMat(INTsProfScan,tmpINTsProfScan); clear tmpINTsProfScan;
-    ReducedFWxM=ExpandMat(ReducedFWxM,tmpReducedFWxM); clear tmpReducedFWxM;
-end
-if ( ~lAnalyseOnly )
+if ( lAnalyse )
+    [BARsProfScan,FWHMsProfScan,INTsProfScan]=deal(missing(),missing(),missing());
+    ReducedFWxM=missing();
     for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
-    % for iScanSetUps=2:2
+        % - compute statistics on profiles at different heights
+        [tmpBARsProfScan,tmpFWHMsProfScan,tmpINTsProfScan]=ComputeDistStats(profiles(:,:,:,:,iScanSetUps),fracEst);
+        % - reduced values for FWxMs:
+        [tmpReducedFWxM]=GetReducedFWxM(tmpFWHMsProfScan,fracEst);
+        % - store data:
+        %   . profiles:
+        BARsProfScan=ExpandMat(BARsProfScan,tmpBARsProfScan); clear tmpBARsProfScan;
+        FWHMsProfScan=ExpandMat(FWHMsProfScan,tmpFWHMsProfScan); clear tmpFWHMsProfScan;
+        INTsProfScan=ExpandMat(INTsProfScan,tmpINTsProfScan); clear tmpINTsProfScan;
+        ReducedFWxM=ExpandMat(ReducedFWxM,tmpReducedFWxM); clear tmpReducedFWxM;
+    end
+end
+if ( lPlot )
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
         % - actual plots (FWHM and baricentre vs Iscan (actual range), CAMeretta and DDS)
         % ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsSumm(:,:,:,iScanSetUps),BARsSumm(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
         ShowScanAligned(IsXLS(:,LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iScanSetUps),FWHMsProf(:,:,:,iScanSetUps),BARsProf(:,:,:,iScanSetUps),indices(:,:,iScanSetUps),scanDescription(iScanSetUps),["CAMeretta" "DDS"],outName(iScanSetUps));
@@ -278,55 +288,57 @@ end
 fprintf("...end of reading MADX files;\n");
 
 %% fit data
-% sigdpp=0:5E-5:1E-3;
-% sigdpp=0:1E-3:1E-3;
 sigdpp=[ 0.0 1E-3 ]; sigdppStrings=compose("sigdpp=%g",sigdpp);
 labelsType=[ "EMI_RMS" "EMI_HWxM" ];
 myYlabels=[ "\sigma [mm]" "HWxM [mm]" ];
-clear beta0 alpha0 emiG z pz dz dpz avedpp TT SS;
-beta0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-alpha0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-emiG=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-z=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-pz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-dz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-dpz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-avedpp=NaN(length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-TT=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-SS=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
-    for iMon=1:nMons
-        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
-        for iPlane=1:length(planes)
-            for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
-                % - range of data set to consider:
-                iMinFit=fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps);
-                iMaxFit=fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps);
-                % - corresponding range in current:
-                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMinFit-myCurr2mon(iMon));
-                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMaxFit-myCurr2mon(iMon));
-                nFit=iMaxFit-iMinFit+1;
-                for iFrac=1:length(fracEst)
-                    for iType=1:length(labelsType)
-                        % - baricentres and sigmas:
-                        TT(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon,iScanSetUps);
-                        if ( strcmpi(labelsType(iType),"EMI_RMS") )
-                            SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=ReducedFWxM(iMinFit:iMaxFit,iPlane,iMon,iFrac,iScanSetUps);
-                        elseif ( strcmpi(labelsType(iType),"EMI_HWxM") )
-                            SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=FWHMsProfScan(iMinFit:iMaxFit,iPlane,iMon,iFrac,iScanSetUps)/2;
+if ( lAnalyse )
+    % sigdpp=0:5E-5:1E-3;
+    % sigdpp=0:1E-3:1E-3;
+    clear beta0 alpha0 emiG z pz dz dpz avedpp TT SS;
+    beta0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    alpha0=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    emiG=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    z=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    pz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    dz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    dpz=NaN(length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    avedpp=NaN(length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    TT=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    SS=NaN(nMaxFitData,length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+        for iMon=1:nMons
+            myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
+            for iPlane=1:length(planes)
+                for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
+                    % - range of data set to consider:
+                    iMinFit=fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps);
+                    iMaxFit=fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps);
+                    % - corresponding range in current:
+                    jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMinFit-myCurr2mon(iMon));
+                    jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==iMaxFit-myCurr2mon(iMon));
+                    nFit=iMaxFit-iMinFit+1;
+                    for iFrac=1:length(fracEst)
+                        for iType=1:length(labelsType)
+                            % - baricentres and sigmas:
+                            TT(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon,iScanSetUps);
+                            if ( strcmpi(labelsType(iType),"EMI_RMS") )
+                                SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=ReducedFWxM(iMinFit:iMaxFit,iPlane,iMon,iFrac,iScanSetUps);
+                            elseif ( strcmpi(labelsType(iType),"EMI_HWxM") )
+                                SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=FWHMsProfScan(iMinFit:iMaxFit,iPlane,iMon,iFrac,iScanSetUps)/2;
+                            end
+                            % - perform fit:
+                            [beta0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),emiG(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),...
+                                dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),~]=FitOpticsThroughSigmaData(TM(:,:,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),sigdpp);
+                            [z(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),avedpp(iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)]=...
+                                FitOpticsThroughOrbitData(TM(:,:,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),TT(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
                         end
-                        % - perform fit:
-                        [beta0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),emiG(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),...
-                            dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),~]=FitOpticsThroughSigmaData(TM(:,:,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),SS(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),sigdpp);
-                        [z(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),avedpp(iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)]=...
-                            FitOpticsThroughOrbitData(TM(:,:,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),TT(1:nFit,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
                     end
                 end
             end
         end
     end
 end
-if ( ~lAnalyseOnly )
+if ( lPlot )
     for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
         for iMon=1:nMons
             % for iType=1:2
@@ -383,67 +395,73 @@ end
 fprintf("...end of fitting;\n");
 
 %% compare fits and measured data
-clear gamma0; gamma0=(1+alpha0.^2)./beta0; % same size as alpha0 and beta0
-clear calcSigmas; calcSigmas=NaN(nMaxFitData,length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-clear calcBars; calcBars=NaN(nMaxFitData,length(sigdpp),1,length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
-clear scanCurrents; scanCurrents=NaN(nMaxFitData,length(planes),nMaxFitSets,nMons,nScanSetUps);
-clear measSigma; measSigma=NaN(nMaxFitData,length(planes),length(fracEst),length(labelsType),nMons,nScanSetUps);
-clear measBARs; measBARs=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
-clear measCurr; measCurr=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
-for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
-    for iMon=1:nMons
-        myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
-        for iPlane=1:length(planes)
-            % - transport optics
-            for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
-                % - range of data set to consider:
-                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
-                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
-                nFit=jMaxFit-jMinFit+1;
-                for iFrac=1:length(fracEst)
-                    for iType=1:length(labelsType)
-                        % - actually transport optics
-                        clear betaO alphaO gammaO;
-                        [betaO,alphaO,gammaO]=TransportOptics(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),...
-                            beta0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),gamma0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
-                        clear dO dpO;
-                        [dO,dpO]=TransportOrbit(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
-                        % - fix NaNs
-                        dO(isnan(dO))=0.0; dpO(isnan(dpO))=0.0; 
-                        % - compute sigmas
-                        calcSigmas(1:nFit,:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=sqrt(betaO.*repmat(emiG(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)',size(betaO,1),1)+...
-                            (dO.*repmat(sigdpp,size(dO,1),1)).^2);
-                        % - transport baricentre (for the time being, independent of fractEst)
-                        if ( iFrac==1 )
-                            [calcBars(1:nFit,:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),~]=TransportOrbit(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),...
-                                z(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
+if ( lAnalyse )
+    clear gamma0; gamma0=(1+alpha0.^2)./beta0; % same size as alpha0 and beta0
+    clear calcSigmas; calcSigmas=NaN(nMaxFitData,length(sigdpp),length(fracEst),length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    clear calcBars; calcBars=NaN(nMaxFitData,length(sigdpp),1,length(planes),nMaxFitSets,length(labelsType),nMons,nScanSetUps);
+    clear scanCurrents; scanCurrents=NaN(nMaxFitData,length(planes),nMaxFitSets,nMons,nScanSetUps);
+    clear measSigma; measSigma=NaN(nMaxFitData,length(planes),length(fracEst),length(labelsType),nMons,nScanSetUps);
+    clear measBARs; measBARs=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
+    clear measCurr; measCurr=NaN(nMaxFitData,length(planes),nMons,nScanSetUps);
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+        for iMon=1:nMons
+            myCurr2mon=GetMyCurr2mon(iCurr2mon,indices(:,1,iScanSetUps));
+            for iPlane=1:length(planes)
+                % - transport optics
+                for iFitSet=1:nFitRanges(iPlane,iScanSetUps)
+                    % - range of data set to consider:
+                    jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,1,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
+                    jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==fitIndices(iMon,2,iPlane,iFitSet,iScanSetUps)-myCurr2mon(iMon));
+                    nFit=jMaxFit-jMinFit+1;
+                    for iFrac=1:length(fracEst)
+                        for iType=1:length(labelsType)
+                            % - actually transport optics
+                            clear betaO alphaO gammaO;
+                            [betaO,alphaO,gammaO]=TransportOptics(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),...
+                                beta0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),alpha0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),gamma0(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
+                            clear dO dpO;
+                            [dO,dpO]=TransportOrbit(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),dz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),dpz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
+                            % - fix NaNs
+                            dO(isnan(dO))=0.0; dpO(isnan(dpO))=0.0; 
+                            % - compute sigmas
+                            calcSigmas(1:nFit,:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)=sqrt(betaO.*repmat(emiG(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps)',size(betaO,1),1)+...
+                                (dO.*repmat(sigdpp,size(dO,1),1)).^2);
+                            % - transport baricentre (for the time being, independent of fractEst)
+                            if ( iFrac==1 )
+                                [calcBars(1:nFit,:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),~]=TransportOrbit(TM(1:2,1:2,jMinFit:jMaxFit,iPlane,iMon,iScanSetUps),...
+                                    z(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps),pz(:,iFrac,iPlane,iFitSet,iType,iMon,iScanSetUps));
+                            end
                         end
                     end
+                    % - keep track of currents
+                    myMapCurr=indices(1,1,iScanSetUps):indices(1,2,iScanSetUps);
+                    scanCurrents(1:nFit,iPlane,iFitSet,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
                 end
-                % - keep track of currents
+                % - set of measurements for fit:
+                %   range of data set to consider:
+                iMinFit=min(fitIndices(iMon,1,iPlane,:,iScanSetUps));
+                iMaxFit=max(fitIndices(iMon,2,iPlane,:,iScanSetUps));
+                %   corresponding range in current:
+                jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==min(fitIndices(iMon,1,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
+                jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
+                nFit=iMaxFit-iMinFit+1;
+                for iType=1:length(labelsType)
+                    if ( strcmpi(labelsType(iType),"EMI_RMS") )
+                        measSigma(1:nFit,iPlane,1:length(fracEst),iType,iMon,iScanSetUps)=reshape(ReducedFWxM(iMinFit:iMaxFit,iPlane,iMon,:,iScanSetUps),nFit,1,length(fracEst));
+                    elseif ( strcmpi(labelsType(iType),"EMI_HWxM") )
+                        measSigma(1:nFit,iPlane,1:length(fracEst),iType,iMon,iScanSetUps)=reshape(FWHMsProfScan(iMinFit:iMaxFit,iPlane,iMon,:,iScanSetUps)/2,nFit,1,length(fracEst));
+                    end
+                end
+                measBARs(1:nFit,iPlane,iMon,iScanSetUps)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon,iScanSetUps);
                 myMapCurr=indices(1,1,iScanSetUps):indices(1,2,iScanSetUps);
-                scanCurrents(1:nFit,iPlane,iFitSet,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
+                measCurr(1:nFit,iPlane,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
             end
-            % - set of measurements for fit:
-            %   range of data set to consider:
-            iMinFit=min(fitIndices(iMon,1,iPlane,:,iScanSetUps));
-            iMaxFit=max(fitIndices(iMon,2,iPlane,:,iScanSetUps));
-            %   corresponding range in current:
-            jMinFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==min(fitIndices(iMon,1,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
-            jMaxFit=find(indices(1,1,iScanSetUps):indices(1,2,iScanSetUps)==max(fitIndices(iMon,2,iPlane,:,iScanSetUps)-myCurr2mon(iMon)));
-            nFit=iMaxFit-iMinFit+1;
-            for iType=1:length(labelsType)
-                if ( strcmpi(labelsType(iType),"EMI_RMS") )
-                    measSigma(1:nFit,iPlane,1:length(fracEst),iType,iMon,iScanSetUps)=reshape(ReducedFWxM(iMinFit:iMaxFit,iPlane,iMon,:,iScanSetUps),nFit,1,length(fracEst));
-                elseif ( strcmpi(labelsType(iType),"EMI_HWxM") )
-                    measSigma(1:nFit,iPlane,1:length(fracEst),iType,iMon,iScanSetUps)=reshape(FWHMsProfScan(iMinFit:iMaxFit,iPlane,iMon,:,iScanSetUps)/2,nFit,1,length(fracEst));
-                end
-            end
-            measBARs(1:nFit,iPlane,iMon,iScanSetUps)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon,iScanSetUps);
-            myMapCurr=indices(1,1,iScanSetUps):indices(1,2,iScanSetUps);
-            measCurr(1:nFit,iPlane,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
         end
-        if ( ~lAnalyseOnly )
+    end
+end
+if ( lPlot )
+    for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
+        for iMon=1:nMons
             % - compare SIGs
             for iType=1:length(labelsType)
                 for iSigDpp=1:length(sigdppStrings)
@@ -459,7 +477,7 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
                         myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
                     end
                     CompareFits(showCalcSigma,showScanCurrents,showMeasSigma,showMeasCurr,"SIG",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),myYlabels(iType),...
-                        fracEstStrings,planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),myOutName);
+                        fracEstStrings,planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges,"",myOutName);
                 end
             end
             % - compare BARs
@@ -477,7 +495,7 @@ for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
                         myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
                     end
                     CompareFits(showCalcBars,showScanCurrents,showMeasBars,showMeasCurr,"BAR",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),"BAR [mm]",...
-                        "all fractions",planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),myOutName);
+                        "all fractions",planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),"",myOutName);
                 end
             end
         end
@@ -507,24 +525,27 @@ ShowFittedOpticsFunctionsGrouped(showBeta0,showAlpha0,showEmiG,showDz,showDpz,sh
 fprintf("...end of comparisons-1;\n");
 
 %% superimpose plots - take 2
-iSigDpp=find(sigdpp==0); iType=find(strcmpi(labelsType,"EMI_RMS")); % iPlane=strcmpi(planes,"HOR");
-% whats=[ "\beta" "\alpha" "\epsilon" ];
-% whatsFigure=[ "BETA" "ALPHA" "EPSILON" ];
-% whatDims=[ "[m]" "[]" "[\mum]" ];
-whats=[ "\epsilon" ];
-whatDims=[ "[\mum]" ];
-whatsFigure=[ "EPSILON" ];
+iSigDpp=find(sigdpp==0);
+% iPlane=strcmpi(planes,"HOR");
+iType=find(strcmpi(labelsType,"EMI_HWxM"));
+whats=[ "\beta" "\alpha" "\epsilon" ];
+whatsFigure=[ "BETA" "ALPHA" "EPSILON" ];
+whatDims=[ "[m]" "[]" "[\mum]" ];
+% iType=find(strcmpi(labelsType,"EMI_RMS"));
+% whats=[ "\epsilon" ];
+% whatDims=[ "[\mum]" ];
+% whatsFigure=[ "EPSILON" ];
 for iPlane=1:length(planes)
     for iWhat=1:length(whats)
         myTitle=sprintf("compare %s - %s plane - %s - %s",whats(iWhat),planes(iPlane),LabelMe(labelsType(iType)),sigdppStrings(iSigDpp));
         clear showMe;
         switch upper(whats(iWhat))
             case "\BETA"
-                showMe=permute(beta0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 6 7 1 3 5]);
+                showMe=permute(beta0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 7 6 1 3 5]);
             case "\ALPHA"
-                showMe=permute(alpha0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 6 7 1 3 5]);
+                showMe=permute(alpha0(iSigDpp,:,iPlane,:,iType,:,:),[2 4 7 6 1 3 5]);
             case "\EPSILON"
-                showMe=permute(emiG(iSigDpp,:,iPlane,:,iType,:,:)*1E6,[2 4 6 7 1 3 5]);
+                showMe=permute(emiG(iSigDpp,:,iPlane,:,iType,:,:)*1E6,[2 4 7 6 1 3 5]);
             otherwise
                 error("Wrong what! %s",whats(iWhat));
         end
@@ -533,10 +554,58 @@ for iPlane=1:length(planes)
         else
             myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
         end
-        % CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims(iWhat),mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName,lKeepFrac,lKeepFits);
-        CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims(iWhat),mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
+        % CompareFittedOptics(1-fracEst',showMe,"1-frac []",[whatDims(iWhat) whatDims(iWhat)],mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName,lKeepFrac,lKeepFits);
+        CompareFittedOptics(1-fracEst',showMe,"1-frac []",[whatDims(iWhat) whatDims(iWhat)],mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
     end
 end
+%
+% - more compact plots
+%   optics functions
+iTypes=[ find(strcmpi(labelsType,"EMI_RMS")) find(strcmpi(labelsType,"EMI_RMS"))];
+whats=[ "\beta" "\epsilon_{RMS}" ];
+whatDims=[ "[m]" "[\mum]" ];
+for iMon=1:nMons
+    for iPlane=1:length(planes)
+        clear showMe; showMe=missing();
+        for iMyRow=1:length(iTypes)
+            if ( startsWith(whats(iMyRow),"\BETA","IgnoreCase",true) )
+                tmpShowMe=permute(beta0(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:),[2 4 7 6 1 3 5]);
+            elseif ( startsWith(whats(iMyRow),"\ALPHA","IgnoreCase",true) )
+                tmpShowMe=permute(alpha0(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:),[2 4 7 6 1 3 5]);
+            elseif ( startsWith(whats(iMyRow),"\EPSILON","IgnoreCase",true) )
+                tmpShowMe=permute(emiG(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:)*1E6,[2 4 7 6 1 3 5]);
+            else
+                error("Wrong what! %s",whats(iWhat));
+            end
+            showMe=ExpandMat(showMe,tmpShowMe); clear tmpShowMe;
+        end
+        myTitle=sprintf("compare - %s - %s plane - %s",mons(iMon),planes(iPlane),sigdppStrings(iSigDpp));
+        if ( sigdpp(iSigDpp)==0.0 )
+            myOutName=sprintf("%s_fittedOptics_compare_%s_%s.fig",outNameCompare,mons(iMon),planes(iPlane)); 
+        else
+            myOutName=sprintf("%s_fittedOptics_compare_%s_%s_%s.fig",outNameCompare,whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
+        end
+        CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims,whats,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
+    end
+end
+%   measurements
+iType=find(strcmpi(labelsType,"EMI_HWxM"));
+for iMon=1:nMons
+    % permute dimensions:
+    clear showCalcSigma; showCalcSigma=permute(calcSigmas(:,iSigDpp,:,:,:,iType,iMon,:),[1 4 5 3 8 6 7 2]);
+    clear showScanCurrents; showScanCurrents=permute(scanCurrents(:,:,:,iMon,:),[1 2 3 5 4]);
+    clear showMeasSigma; showMeasSigma=permute(measSigma(:,:,:,iType,iMon,:),[1 2 3 6 5 4]);
+    clear showMeasCurr; showMeasCurr=permute(measCurr(:,:,iMon,:),[1 2 4 3]);
+    myTitle=sprintf("compare fitted measurements - %s - %s - %s",mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+    if ( sigdpp(iSigDpp)==0.0 )
+        myOutName=sprintf("%s_fittedOptics_compareFitsSIGs_%s_%s.fig",outNameCompare,mons(iMon),labelsType(iType)); 
+    else
+        myOutName=sprintf("%s_fittedOptics_compareFitsSIGs_%s_%s_%s.fig",outNameCompare,mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+    end
+    CompareFits(showCalcSigma,showScanCurrents,showMeasSigma,showMeasCurr,"SIG","I [A]","HWxM [mm]",...
+        fracEstStrings,planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges,scanDescription,myOutName);
+end
+
 fprintf("...end of comparisons-2;\n");
         
 %%
