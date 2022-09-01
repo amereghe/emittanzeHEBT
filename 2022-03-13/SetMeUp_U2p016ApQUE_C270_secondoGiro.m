@@ -16,12 +16,12 @@ if ( ~exist('DDSpaths','var') ), DDSpaths=strings(length(CAMpaths),1); DDSpaths(
 % - 1st col: 1=current, 2=CAM (summary file), 3=DDS (summary file);
 % - 2nd col: min,max;
 indices(1,:,iScanSetUps)=[5 44];
-indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)-2;
-indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)-1;
+indices(2,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(1);
+indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(2);
 % indices for fitting data
 clear fitIndicesH fitIndicesV;
 % - CAM
-fitIndicesH=[  5 41;  9 37; 13 33; 17 29; 18 28; 19 27]'; % HOR plane, symmetric, 6 couples (min at ID=23)
+fitIndicesH=[  7 39; 10 36; 13 33; 15 31; 17 29; 19 27]'; % HOR plane, symmetric, 6 couples (min at ID=23)
 fitIndicesV=[  4 32;  7 29; 10 26; 13 23; 14 22; 15 21]'; % VER plane, symmetric, 6 couples (min at ID=18)
 if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);

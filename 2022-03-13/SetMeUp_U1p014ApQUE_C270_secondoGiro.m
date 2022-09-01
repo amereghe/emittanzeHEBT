@@ -21,8 +21,8 @@ indices(3,:,iScanSetUps)=indices(1,:,iScanSetUps)+iCurr2mon(2);
 % indices for fitting data
 % - CAM
 clear fitIndicesH fitIndicesV;
-fitIndicesH=[12 30; 13 29; 14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples (min at ID=21)
-fitIndicesV=[18 42; 19 41; 20 40; 21 39; 22 38; 24 36; 26 34]'; % VER plane, symmetric, 7 couples (min at ID=30)
+fitIndicesH=[14 28; 15 27; 16 26; 17 25; 18 24]'; % HOR plane, symmetric, 7 couples (min at ID=21)
+fitIndicesV=[18 42; 20 40; 22 38; 24 36; 26 34]'; % VER plane, symmetric, 7 couples (min at ID=30)
 if ( ~exist('fitIndicesV','var') ), fitIndicesV=fitIndicesH; end
 nFitRanges(1,iScanSetUps)=size(fitIndicesH,2);
 nFitRanges(2,iScanSetUps)=size(fitIndicesV,2);
