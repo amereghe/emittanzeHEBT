@@ -9,9 +9,9 @@ function [cyProgs,cyCodes,profiles,nData]=AcquireDistributions(CAMProfsPaths,DDS
         return
     end
     
-    profiles=zeros(1,2,2,nProfTypes); % 1:fiber_pos; 2:z,data; 3:hor/ver; 4:CAM/DDS;
-    cyProgs=strings(1,nProfTypes);    % CAM and DDS
-    cyCodes=strings(1,nProfTypes);    % CAM and DDS
+    profiles=missing();               % 1:fiber_pos; 2:z,data; 3:hor/ver; 4:CAM/DDS;
+    cyProgs=missing();                % CAM and DDS
+    cyCodes=missing();                % CAM and DDS
     nData=zeros(nProfTypes,1);        % CAM and DDS
     
     for jProf=1:nProfTypes
@@ -24,10 +24,10 @@ function [cyProgs,cyCodes,profiles,nData]=AcquireDistributions(CAMProfsPaths,DDS
         % acquire profiles
         if ( length(myPaths)>0 )
             [tmpProfiles,tmpCyCodes,tmpCyProgs]=ParseDDSProfiles(myPaths,profTypes(jProf));
-            profiles(1:size(tmpProfiles,1),1:size(tmpProfiles,2),1:size(tmpProfiles,3),jProf)=tmpProfiles;
             nData(jProf)=length(tmpCyProgs);
-            cyProgs(1:nData(jProf),jProf)=tmpCyProgs;
-            cyCodes(1:nData(jProf),jProf)=tmpCyCodes;
+            profiles=ExpandMat(profiles,tmpProfiles); clear tmpProfiles;
+            cyCodes=ExpandMat(cyCodes,tmpCyCodes); clear tmpCyCodes;
+            cyProgs=ExpandMat(cyProgs,tmpCyProgs); clear tmpCyProgs;
             fprintf("...acquired %d %s profiles;\n",nData(1),profTypes(jProf));
         end
     end
