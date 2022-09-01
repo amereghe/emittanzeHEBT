@@ -1,4 +1,4 @@
-function CompareFittedOptics(xVals,yVals,myXLabel,myYLabel,RowNames,ColNames,SeriesNames,myTitle,outName,filterX,filterY)
+function CompareFittedOptics(xVals,yVals,myXLabel,myYLabels,RowNames,ColNames,SeriesNames,myTitle,outName,filterX,filterY)
     if ( exist("filterX","var") && exist("filterY","var") ), lFilter=true; end
     if ( ~exist("filterY","var") ), lFilter=false; end
     nRows=length(RowNames); % eg: mons
@@ -17,16 +17,16 @@ function CompareFittedOptics(xVals,yVals,myXLabel,myYLabel,RowNames,ColNames,Ser
         for iCol=1:nCols
             iPlot=iPlot+1; axs(iRow,iCol)=nexttile; % subplot(nRows,nCols+1,iPlot); %#ok<*AGROW>
             if ( lFilter )
-                plot(xVals(filterX(:,iRow,iCol)),yVals(filterX(:,iRow,iCol),filterY(:,iRow,iCol),iRow,iCol),"k*"); hold on
+                plot(xVals(filterX(:,iRow,iCol)),yVals(filterX(:,iRow,iCol),filterY(:,iRow,iCol),iCol,iRow),"k*"); hold on
             end
             lFirst=true;
             for iSeries=1:nSeries
-                if ( any(~isnan(yVals(:,iSeries,iRow,iCol))) )
+                if ( any(~isnan(yVals(:,iSeries,iCol,iRow))) )
                     if ( lFirst ), lFirst=false; else, hold on; end
-                    plot(xVals,yVals(:,iSeries,iRow,iCol),".-","color",cm(iSeries,:));
+                    plot(xVals,yVals(:,iSeries,iCol,iRow),".-","color",cm(iSeries,:));
                 end
             end
-            grid(); xlabel(myXLabel); ylabel(myYLabel); title(sprintf("%s - %s",RowNames(iRow),ColNames(iCol)));
+            grid(); xlabel(myXLabel); ylabel(sprintf("%s %s",RowNames(iRow),myYLabels(iRow))); title(ColNames(iCol));
         end
         if ( iRow==1 )
             % legend
