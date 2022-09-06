@@ -20,29 +20,59 @@ LPOWmonPath="S:\Area Ricerca\EMITTANZE SUMMARY\EMITTANZE SUMMARY\LPOW_error_log"
 fracEst=[ 0.9 0.8 0.7 0.6 0.5 0.4 0.3 0.2 ]; % 
 fracEstStrings=compose("frac=%g%%",fracEst*100);
 
+iCurr2mon=[-2 -1]; % 1=CAM, 2=DDS; iCAM=iCurr+iCurr2mon(1); iDDS=iCurr+iCurr2mon(2);
+
 mons=["CAM" "DDS"]; nMons=length(mons);
 planes=["HOR" "VER"];
 
-allLGENs=["P9-003A-LGEN" "P9-004A-LGEN" "P9-005A-LGEN" "P9-006A-LGEN" "P9-007A-LGEN" "P9-008A-LGEN" ];
+% - processing
+lAnalyse=true;
+lPlot=true;
 
+% -------------------------------------------------------------------------
+% 2021-09-03
+% -------------------------------------------------------------------------
+allLGENs=["PB-005A-LGEN" "PB-006A-LGEN" "PB-007A-LGEN" "PB-008A-LGEN" "PB-009A-LGEN"];
 LPOWlogFiles=[
-    "2022-03-13\*.txt"
+    "2021-09-02\*.txt"
+    "2021-09-03\*.txt"
     ];
 
-iCurr2mon=[-2 -1]; % 1=CAM, 2=DDS; iCAM=iCurr+iCurr2mon(1); iDDS=iCurr+iCurr2mon(2);
-
 beamPart="CARBON";
-machine="LineU";
+machine="LineZ";
 config="TM"; % select configuration: TM, RFKO
 
 scanSetUps=[
-    "2022-03-13\SetMeUp_U1p008ApQUE_C270_primoGiro.m"
-    "2022-03-13\SetMeUp_U1p014ApQUE_C270_primoGiro.m"
-    "2022-03-13\SetMeUp_U1p018ApQUE_C270_primoGiro.m"
-    "2022-03-13\SetMeUp_U2p006ApQUE_C270_primoGiro.m"
-    "2022-03-13\SetMeUp_U2p010ApQUE_C270_primoGiro.m"
-    "2022-03-13\SetMeUp_U2p016ApQUE_C270_primoGiro.m"
+    "2021-09\SetMeUp_ScanZ212_C170.m"
+    "2021-09\SetMeUp_ScanZ218_C170.m"
+%     "2021-09\SetMeUp_ScanZ212_C270.m"
+%     "2021-09\SetMeUp_ScanZ218_C270.m"
     ];
+
+% - element where optics functions are reconstructed
+recoEle="H5_018B_SFH";
+recoEleML=strrep(recoEle,"_","p");
+
+% % -------------------------------------------------------------------------
+% % 2022-03-13
+% % -------------------------------------------------------------------------
+% allLGENs=["P9-003A-LGEN" "P9-004A-LGEN" "P9-005A-LGEN" "P9-006A-LGEN" "P9-007A-LGEN" "P9-008A-LGEN" ];
+% LPOWlogFiles=[
+%     "2022-03-13\*.txt"
+%     ];
+% 
+% beamPart="CARBON";
+% machine="LineU";
+% config="TM"; % select configuration: TM, RFKO
+% 
+% % scanSetUps=[
+% %     "2022-03-13\SetMeUp_U1p008ApQUE_C270_primoGiro.m"
+% %     "2022-03-13\SetMeUp_U1p014ApQUE_C270_primoGiro.m"
+% %     "2022-03-13\SetMeUp_U1p018ApQUE_C270_primoGiro.m"
+% %     "2022-03-13\SetMeUp_U2p006ApQUE_C270_primoGiro.m"
+% %     "2022-03-13\SetMeUp_U2p010ApQUE_C270_primoGiro.m"
+% %     "2022-03-13\SetMeUp_U2p016ApQUE_C270_primoGiro.m"
+% %     ];
 % scanSetUps=[
 %     "2022-03-13\SetMeUp_U1p008ApQUE_C270_secondoGiro.m"
 %     "2022-03-13\SetMeUp_U1p014ApQUE_C270_secondoGiro.m"
@@ -51,15 +81,16 @@ scanSetUps=[
 %     "2022-03-13\SetMeUp_U2p010ApQUE_C270_secondoGiro.m"
 %     "2022-03-13\SetMeUp_U2p016ApQUE_C270_secondoGiro.m"
 %     ];
+% 
+% % - element where optics functions are reconstructed
+% recoEle="H5_018B_SFH";
+% recoEleML=strrep(recoEle,"_","p");
+
+%% main - load infos
 % - scan infos
 nScanSetUps=length(scanSetUps);
 iMinScanSetUps=1; iMaxScanSetUps=nScanSetUps; % iMinScanSetUps=1; iMaxScanSetUps=1;
 
-% - processing
-lAnalyse=true;
-lPlot=true;
-
-%% main - load infos
 % - indices in measurements (CAM/DDS summary files):
 %   . 1st col: 1=current, 2=CAM, 3=DDS;
 %   . 2nd col: min,max;
@@ -87,7 +118,9 @@ for ii=1:length(LPOWlogFiles)
 end
 
 %% main - gatherings
-run("2022-03-13\gatherings_primoGiro_All.m");
+% run("2021-09\gatherings_C270_All.m");
+run("2021-09\gatherings_C170_All.m");
+% run("2022-03-13\gatherings_primoGiro_All.m");
 % run("2022-03-13\gatherings_secondoGiro_All.m");
 
 %% main - parse data files
@@ -268,12 +301,17 @@ end
 fprintf("...end of exporting to MADX files;\n");
 
 %% read MADX tfs table with response matrices of scan
-TM=missing();
+TM=missing(); nMaxFitData=0;
 for iScanSetUps=iMinScanSetUps:iMaxScanSetUps
     tmpTM=NaN(3,3,1,length(planes),nMons);
     for iMon=1:nMons
-        nMaxFitData=max(fitIndices(iMon,2,:,:,iScanSetUps),[],"all")-min(fitIndices(iMon,1,:,:,iScanSetUps),[],"all")+1;
-        reMatFileName=sprintf("externals\\optics\\HEBT\\%s_%s_ReMat.tfs",plotName(iScanSetUps),mons(iMon));
+        nMaxFitData=max(max(fitIndices(iMon,2,:,:,iScanSetUps),[],"all")-min(fitIndices(iMon,1,:,:,iScanSetUps),[],"all")+1,nMaxFitData);
+        if ( strlength(recoEle)>0 )
+            reMatFileName=sprintf("%s\\%s\\%s_%s_ReMat.tfs",MADXpaths(iScanSetUps),recoEle,plotName(iScanSetUps),mons(iMon));
+        else
+            reMatFileName=sprintf("%s\\%s_%s_ReMat.tfs",MADXpaths(iScanSetUps),plotName(iScanSetUps),mons(iMon));
+        end
+        
         fprintf('parsing file %s ...\n',reMatFileName);
         rMatrix = readmatrix(reMatFileName,'HeaderLines',1,'Delimiter',',','FileType','text');
         for iPlane=1:length(planes)
@@ -361,11 +399,20 @@ if ( lPlot )
                         clear showDpz; showDpz=permute(dpz(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
                         clear showZ; showZ=permute(z(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
                         clear showPz; showPz=permute(pz(iSigDpp,:,iPlane,1:nFitRanges(iPlane,iScanSetUps),iType,iMon,iScanSetUps),[2 4 3 1]);
-                        myTitle=sprintf("%s - %s - %s plane - %s - %s",scanDescription(iScanSetUps),mons(iMon),planes(iPlane),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
-                        if ( sigdpp(iSigDpp)==0.0 )
-                            myOutName=sprintf("%s_%s_fittedOptics_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane)); 
+                        if ( strlength(recoEle)>0 )
+                            myTitle=sprintf("%s - %s - %s - %s plane - %s - %s",scanDescription(iScanSetUps),mons(iMon),LabelMe(recoEle),planes(iPlane),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                            if ( sigdpp(iSigDpp)==0.0 )
+                                myOutName=sprintf("%s_%s_%s_fittedOptics_%s_%s.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType),planes(iPlane)); 
+                            else
+                                myOutName=sprintf("%s_%s_%s_fittedOptics_%s_%s_%s.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType),planes(iPlane),sigdppStrings(iSigDpp)); 
+                            end
                         else
-                            myOutName=sprintf("%s_%s_fittedOptics_%s_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane),sigdppStrings(iSigDpp)); 
+                            myTitle=sprintf("%s - %s - %s plane - %s - %s",scanDescription(iScanSetUps),mons(iMon),planes(iPlane),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                            if ( sigdpp(iSigDpp)==0.0 )
+                                myOutName=sprintf("%s_%s_fittedOptics_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane)); 
+                            else
+                                myOutName=sprintf("%s_%s_fittedOptics_%s_%s_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),planes(iPlane),sigdppStrings(iSigDpp)); 
+                            end
                         end
                         ShowFittedOpticsFunctionsGrouped(showBeta0,showAlpha0,showEmiG,showDz,showDpz,showZ,showPz,...
                             1-fracEst,"1-frac []",compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
@@ -379,11 +426,20 @@ if ( lPlot )
                     clear showBeta0; showBeta0=permute(beta0(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]); 
                     clear showAlpha0; showAlpha0=permute(alpha0(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]);
                     clear showEmiG; showEmiG=permute(emiG(iSigDpp,:,:,:,iType,iMon,iScanSetUps),[2 4 3 1]);
-                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
-                    if ( sigdpp(iSigDpp)==0.0 )
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    if ( strlength(recoEle)>0 )
+                        myTitle=sprintf("%s - %s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),LabelMe(recoEle),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_ellypses.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_ellypses_%s.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     else
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_ellypses_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     end
                     ShowFittedEllipsesGrouped(showBeta0,showAlpha0,showEmiG,nFitRanges(:,iScanSetUps),...
                         planes,compose("fit set #%2d",1:nMaxFitSets),fracEstStrings,myTitle,myOutName);
@@ -435,7 +491,7 @@ if ( lAnalyse )
                     end
                     % - keep track of currents
                     myMapCurr=indices(1,1,iScanSetUps):indices(1,2,iScanSetUps);
-                    scanCurrents(1:nFit,iPlane,iFitSet,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
+                    scanCurrents(1:nFit,iPlane,iFitSet,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),allLGENs==LGENscanned(iScanSetUps),iMon,iScanSetUps);
                 end
                 % - set of measurements for fit:
                 %   range of data set to consider:
@@ -454,7 +510,7 @@ if ( lAnalyse )
                 end
                 measBARs(1:nFit,iPlane,iMon,iScanSetUps)=BARsProfScan(iMinFit:iMaxFit,iPlane,iMon,iScanSetUps);
                 myMapCurr=indices(1,1,iScanSetUps):indices(1,2,iScanSetUps);
-                measCurr(1:nFit,iPlane,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),LGENnamesXLS(:,iScanSetUps)==LGENscanned(iScanSetUps),iMon,iScanSetUps);
+                measCurr(1:nFit,iPlane,iMon,iScanSetUps)=tableIs(myMapCurr(jMinFit:jMaxFit),allLGENs==LGENscanned(iScanSetUps),iMon,iScanSetUps);
             end
         end
     end
@@ -470,11 +526,20 @@ if ( lPlot )
                     clear showScanCurrents; showScanCurrents=scanCurrents(:,:,:,iMon,iScanSetUps); % showScanCurrents(nMaxFitData,length(planes),nMaxFitSets)
                     clear showMeasSigma; showMeasSigma=measSigma(:,:,:,iType,iMon,iScanSetUps); % showMeasSigma(nMaxFitData,length(planes),fracEst)
                     clear showMeasCurr; showMeasCurr=measCurr(:,:,iMon,iScanSetUps); % showMeasCurr(nMaxFitData,length(planes))
-                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
-                    if ( sigdpp(iSigDpp)==0.0 )
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    if ( strlength(recoEle)>0 )
+                        myTitle=sprintf("%s - %s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),LabelMe(recoEle),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_compareFitsSIGs.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_compareFitsSIGs_%s.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     else
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsSIGs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     end
                     CompareFits(showCalcSigma,showScanCurrents,showMeasSigma,showMeasCurr,"SIG",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),myYlabels(iType),...
                         fracEstStrings,planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges,"",myOutName);
@@ -488,11 +553,20 @@ if ( lPlot )
                     clear showScanCurrents; showScanCurrents=scanCurrents(:,:,:,iMon,iScanSetUps); % showScanCurrents(nMaxFitData,length(planes),nMaxFitSets)
                     clear showMeasBars; showMeasBars=measBARs(:,:,iMon,iScanSetUps); % showMeasBars(nMaxFitData,length(planes))
                     clear showMeasCurr; showMeasCurr=measCurr(:,:,iMon,iScanSetUps); % showMeasCurr(nMaxFitData,length(planes))
-                    myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
-                    if ( sigdpp(iSigDpp)==0.0 )
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                    if ( strlength(recoEle)>0 )
+                        myTitle=sprintf("%s - %s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),LabelMe(recoEle),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_compareFitsBARs.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_%s_fittedOptics_%s_compareFitsBARs_%s.fig",outName(iScanSetUps),mons(iMon),recoEleML,labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     else
-                        myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        myTitle=sprintf("%s - %s - %s - %s",scanDescription(iScanSetUps),mons(iMon),sigdppStrings(iSigDpp),LabelMe(labelsType(iType)));
+                        if ( sigdpp(iSigDpp)==0.0 )
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs.fig",outName(iScanSetUps),mons(iMon),labelsType(iType)); 
+                        else
+                            myOutName=sprintf("%s_%s_fittedOptics_%s_compareFitsBARs_%s.fig",outName(iScanSetUps),mons(iMon),labelsType(iType),sigdppStrings(iSigDpp)); 
+                        end
                     end
                     CompareFits(showCalcBars,showScanCurrents,showMeasBars,showMeasCurr,"BAR",sprintf("I_{%s} [A]",LGENscanned(iScanSetUps)),"BAR [mm]",...
                         "all fractions",planes,compose("fit set #%2d",1:nMaxFitSets),myTitle,mons(iMon),nFitRanges(:,iScanSetUps),"",myOutName);
@@ -537,7 +611,6 @@ whatDims=[ "[m]" "[]" "[\mum]" ];
 % whatsFigure=[ "EPSILON" ];
 for iPlane=1:length(planes)
     for iWhat=1:length(whats)
-        myTitle=sprintf("compare %s - %s plane - %s - %s",whats(iWhat),planes(iPlane),LabelMe(labelsType(iType)),sigdppStrings(iSigDpp));
         clear showMe;
         switch upper(whats(iWhat))
             case "\BETA"
@@ -549,10 +622,20 @@ for iPlane=1:length(planes)
             otherwise
                 error("Wrong what! %s",whats(iWhat));
         end
-        if ( sigdpp(iSigDpp)==0.0 )
-            myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane)); 
+        if ( strlength(recoEle)>0 )
+            myTitle=sprintf("compare %s - %s - %s plane - %s - %s",whats(iWhat),LabelMe(recoEle),planes(iPlane),LabelMe(labelsType(iType)),sigdppStrings(iSigDpp));
+            if ( sigdpp(iSigDpp)==0.0 )
+                myOutName=sprintf("%s_%s_fittedOptics_%s_compare_%s_%s.fig",outNameCompare,recoEleML,labelsType(iType),whatsFigure(iWhat),planes(iPlane)); 
+            else
+                myOutName=sprintf("%s_%s_fittedOptics_%s_compare_%s_%s_%s.fig",outNameCompare,recoEleML,labelsType(iType),whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
+            end
         else
-            myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
+            myTitle=sprintf("compare %s - %s plane - %s - %s",whats(iWhat),planes(iPlane),LabelMe(labelsType(iType)),sigdppStrings(iSigDpp));
+            if ( sigdpp(iSigDpp)==0.0 )
+                myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane)); 
+            else
+                myOutName=sprintf("%s_fittedOptics_%s_compare_%s_%s_%s.fig",outNameCompare,labelsType(iType),whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
+            end
         end
         % CompareFittedOptics(1-fracEst',showMe,"1-frac []",[whatDims(iWhat) whatDims(iWhat)],mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName,lKeepFrac,lKeepFits);
         CompareFittedOptics(1-fracEst',showMe,"1-frac []",[whatDims(iWhat) whatDims(iWhat)],mons,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
@@ -560,32 +643,48 @@ for iPlane=1:length(planes)
 end
 %
 % - more compact plots
-%   optics functions
-iTypes=[ find(strcmpi(labelsType,"EMI_RMS")) find(strcmpi(labelsType,"EMI_RMS"))];
-whats=[ "\beta" "\epsilon_{RMS}" ];
-whatDims=[ "[m]" "[\mum]" ];
-for iMon=1:nMons
-    for iPlane=1:length(planes)
-        clear showMe; showMe=missing();
-        for iMyRow=1:length(iTypes)
-            if ( startsWith(whats(iMyRow),"\BETA","IgnoreCase",true) )
-                tmpShowMe=permute(beta0(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:),[2 4 7 6 1 3 5]);
-            elseif ( startsWith(whats(iMyRow),"\ALPHA","IgnoreCase",true) )
-                tmpShowMe=permute(alpha0(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:),[2 4 7 6 1 3 5]);
-            elseif ( startsWith(whats(iMyRow),"\EPSILON","IgnoreCase",true) )
-                tmpShowMe=permute(emiG(iSigDpp,:,iPlane,:,iTypes(iMyRow),iMon,:)*1E6,[2 4 7 6 1 3 5]);
-            else
-                error("Wrong what! %s",whats(iWhat));
+%   optics and orbit functions
+iTypes=[ find(strcmpi(labelsType,"EMI_RMS")) find(strcmpi(labelsType,"EMI_RMS")) ; find(strcmpi(labelsType,"EMI_RMS")) find(strcmpi(labelsType,"EMI_RMS")) ];
+whats=[ "\beta" "\epsilon_{RMS}" ; "Z" "PZ" ];
+whatsFigure=[ "BETA" "EMI_RMS" ; "Z" "PZ" ];
+whatDims=[ "[m]" "[\mum]" ; "[mm]" "[mrad]" ];
+for iPlot=1:size(whats,1)
+    for iMon=1:nMons
+        for iPlane=1:length(planes)
+            clear showMe; showMe=missing();
+            for iMyRow=1:size(whats,2)
+                if ( startsWith(whats(iPlot,iMyRow),"\BETA","IgnoreCase",true) )
+                    tmpShowMe=permute(beta0(iSigDpp,:,iPlane,:,iTypes(iPlot,iMyRow),iMon,:),[2 4 7 6 1 3 5]);
+                elseif ( startsWith(whats(iPlot,iMyRow),"\ALPHA","IgnoreCase",true) )
+                    tmpShowMe=permute(alpha0(iSigDpp,:,iPlane,:,iTypes(iPlot,iMyRow),iMon,:),[2 4 7 6 1 3 5]);
+                elseif ( startsWith(whats(iPlot,iMyRow),"\EPSILON","IgnoreCase",true) )
+                    tmpShowMe=permute(emiG(iSigDpp,:,iPlane,:,iTypes(iPlot,iMyRow),iMon,:)*1E6,[2 4 7 6 1 3 5]);
+                elseif ( startsWith(whats(iPlot,iMyRow),"Z","IgnoreCase",true) )
+                    tmpShowMe=permute(z(iSigDpp,:,iPlane,:,iTypes(iPlot,iMyRow),iMon,:)*1E3,[2 4 7 6 1 3 5]);
+                elseif ( startsWith(whats(iPlot,iMyRow),"PZ","IgnoreCase",true) )
+                    tmpShowMe=permute(pz(iSigDpp,:,iPlane,:,iTypes(iPlot,iMyRow),iMon,:)*1E3,[2 4 7 6 1 3 5]);
+                else
+                    error("Wrong what! %s",whats(iPlot,iWhat));
+                end
+                showMe=ExpandMat(showMe,tmpShowMe); clear tmpShowMe;
             end
-            showMe=ExpandMat(showMe,tmpShowMe); clear tmpShowMe;
+            if ( strlength(recoEle)>0 )
+                myTitle=sprintf("compare - %s - %s - %s plane - %s",mons(iMon),LabelMe(recoEle),planes(iPlane),sigdppStrings(iSigDpp));
+                if ( sigdpp(iSigDpp)==0.0 )
+                    myOutName=sprintf("%s_%s_fittedOptics_compare_%s_%s_%s.fig",outNameCompare,mons(iMon),join(whatsFigure(iPlot,:),"_"),recoEleML,planes(iPlane)); 
+                else
+                    myOutName=sprintf("%s_%s_fittedOptics_compare_%s_%s_%s_%s.fig",outNameCompare,mons(iMon),join(whatsFigure(iPlot,:),"_"),recoEleML,planes(iPlane),sigdppStrings(iSigDpp)); 
+                end
+            else
+                myTitle=sprintf("compare - %s - %s plane - %s",mons(iMon),planes(iPlane),sigdppStrings(iSigDpp));
+                if ( sigdpp(iSigDpp)==0.0 )
+                    myOutName=sprintf("%s_%s_fittedOptics_compare_%s_%s.fig",outNameCompare,mons(iMon),join(whatsFigure(iPlot,:),"_"),planes(iPlane)); 
+                else
+                    myOutName=sprintf("%s_%s_fittedOptics_compare_%s_%s_%s.fig",outNameCompare,mons(iMon),join(whatsFigure(iPlot,:),"_"),planes(iPlane),sigdppStrings(iSigDpp)); 
+                end
+            end
+            CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims(iPlot,:)',whats(iPlot,:)',scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
         end
-        myTitle=sprintf("compare - %s - %s plane - %s",mons(iMon),planes(iPlane),sigdppStrings(iSigDpp));
-        if ( sigdpp(iSigDpp)==0.0 )
-            myOutName=sprintf("%s_fittedOptics_compare_%s_%s.fig",outNameCompare,mons(iMon),planes(iPlane)); 
-        else
-            myOutName=sprintf("%s_fittedOptics_compare_%s_%s_%s.fig",outNameCompare,whatsFigure(iWhat),planes(iPlane),sigdppStrings(iSigDpp)); 
-        end
-        CompareFittedOptics(1-fracEst',showMe,"1-frac []",whatDims,whats,scanDescription,compose("fit set #%2d",1:nMaxFitSets),myTitle,myOutName);
     end
 end
 %   measurements

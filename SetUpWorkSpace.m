@@ -24,6 +24,12 @@ for ii=1:length(CAMpaths)
     DDSProfsPaths(ii,iScanSetUps)=sprintf("%s\\%s\\%s\\Profiles\\Data*DDSF.csv",measPath,path(iScanSetUps),DDSpaths(ii));
 end
 clear ii;
+% path to MADX files
+MADXpaths(iScanSetUps)=sprintf("externals\\optics\\HEBT\\%s",filepath);
+if not(isfolder(MADXpaths(iScanSetUps)))
+    warning("...creating folder %s...",MADXpaths(iScanSetUps));
+    mkdir(MADXpaths(iScanSetUps));
+end
 
 %% largest fit range
 for iMon=1:2
