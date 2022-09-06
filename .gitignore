@@ -1,0 +1,2 @@
+# exclude .fig files
+**.fig
