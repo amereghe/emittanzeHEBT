@@ -4,6 +4,7 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
     nMons=2;
     nPlotsPerMon=5;
     nLevels=size(FWHMs,4);
+    cm=colormap(parula(nLevels));
     planes=[ "HOR" "VER" ];
     iPlot=0;
     Xs=Is(indices(1,1):indices(1,2));
@@ -20,7 +21,7 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
             for iLev=1:nLevels
                 if (iLev>1), hold on; end
                 Ys=FWHMs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon,iLev);
-                plot(Xs,Ys,"*-");
+                plot(Xs,Ys,".-","Color",cm(iLev,:));
             end
             PlotMonsBinWidth(Xs,myMon);
             if (iPlot==1), legend(string(fracEst*100)+"%","Location","best"); end
@@ -32,7 +33,7 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
             for iLev=1:nLevels
                 if (iLev>1), hold on; end
                 Ys=ReducedFWxM(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon,iLev);
-                plot(Xs,Ys,"*-");
+                plot(Xs,Ys,".-","Color",cm(iLev,:));
             end
             PlotMonsBinWidth(Xs,myMon);
             % legend(string(fracEst*100)+"%","Location","best");
@@ -42,10 +43,10 @@ function FWxMPlots(Is,FWHMs,BARs,ReducedFWxM,fracEst,indices,scanDescription,act
         iPlot=iPlot+1; ax(iPlot)=subplot(nMons,nPlotsPerMon,iPlot);
         % - hor
         yyaxis left; iPlane=1;
-        Ys=BARs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon); plot(Xs,Ys,"*-");
+        Ys=BARs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon); plot(Xs,Ys,".-");
         ylabel(sprintf("BAR_{%s} [mm]",planes(iPlane)));
         yyaxis right; iPlane=2;
-        Ys=BARs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon); plot(Xs,Ys,"*-");
+        Ys=BARs(indices(iMon+1,1):indices(iMon+1,2),iPlane,iMon); plot(Xs,Ys,".-");
         ylabel(sprintf("BAR_{%s} [mm]",planes(iPlane)));
         yyaxis left;
         grid on; xlabel("I [A]");
